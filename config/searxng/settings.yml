@@ -1,0 +1,29 @@
+# Minimal overrides merged onto SearXNG's built-in defaults.
+# Local/private instance only — do not expose this port publicly as-is.
+use_default_settings: true
+
+general:
+  instance_name: "mcp-kb-searxng"
+
+server:
+  secret_key: "mcp-kb-local-searxng-secret-change-me"
+  limiter: false
+  image_proxy: false
+
+search:
+  formats:
+    - html
+    - json
+
+# Keep responses fast: don't wait on engines that time out / captcha / error
+# from this network (duckduckgo captchas the proxy IP, wikidata/wikipedia
+# time out, startpage returns malformed JSON here).
+engines:
+  - name: duckduckgo
+    disabled: true
+  - name: wikidata
+    disabled: true
+  - name: wikipedia
+    disabled: true
+  - name: startpage
+    disabled: true

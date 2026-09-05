@@ -1,0 +1,2 @@
+# This directory holds runtime data (cloned repos, graph snapshot, metadata,
+# Qdrant volume mounts). Contents are git-ignored.

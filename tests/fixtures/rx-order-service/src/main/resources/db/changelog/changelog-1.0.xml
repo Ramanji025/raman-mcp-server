@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog">
+    <changeSet id="1" author="rx">
+        <createTable tableName="orders">
+            <column name="id" type="BIGINT"/>
+            <column name="status" type="VARCHAR(32)"/>
+            <column name="patient_id" type="BIGINT"/>
+            <column name="total_amount" type="NUMERIC(12,2)"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

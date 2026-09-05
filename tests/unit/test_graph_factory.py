@@ -1,0 +1,30 @@
+"""Unit tests for graph backend selection (graph/factory.py)."""
+from __future__ import annotations
+
+import pytest
+
+from mcp_kb.graph.factory import get_graph_store
+
+
+def test_networkx_runtime_backend_is_rejected(settings):
+    settings.graph_backend = "networkx"
+    with pytest.raises(ValueError, match="Neo4j is required"):
+        get_graph_store(settings)
+
+
+def test_unknown_runtime_backend_is_rejected(settings):
+    settings.graph_backend = "not-a-real-backend"
+    with pytest.raises(ValueError, match="Neo4j is required"):
+        get_graph_store(settings)
+
+
+def test_neo4j_backend_selection_raises_when_unreachable(settings):
+    """Neo4j must fail fast rather than silently creating an empty graph."""
+    settings.graph_backend = "neo4j"
+    settings.neo4j_uri = "bolt://localhost:1"  # nothing listens here
+    raised = False
+    try:
+        get_graph_store(settings)
+    except Exception:
+        raised = True
+    assert raised, "expected a connection error instead of a silent empty graph"

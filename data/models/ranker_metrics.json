@@ -1,0 +1,8 @@
+{
+  "trained_at": 1788529816.4997673,
+  "n_rows": 15,
+  "auc": null,
+  "trained": false,
+  "reason": "only 15 rows, need >= 30",
+  "model_path": null
+}

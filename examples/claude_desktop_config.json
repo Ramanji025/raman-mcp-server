@@ -1,0 +1,17 @@
+{
+  "//": "Claude Desktop — merge into claude_desktop_config.json.",
+  "//windows": "%APPDATA%\\Claude\\claude_desktop_config.json",
+  "//macos": "~/Library/Application Support/Claude/claude_desktop_config.json",
+  "//note": "Replace absolute paths with your checkout location, then restart Claude Desktop.",
+  "mcpServers": {
+    "microservices-kb": {
+      "command": "C:/path/to/mcp-microservices-kb/.venv/Scripts/mcp-kb-server.exe",
+      "env": {
+        "MCP_KB_REPOS_ROOT": "C:/path/to/mcp-microservices-kb/data/repos",
+        "QDRANT_URL": "http://localhost:6333",
+        "EMBEDDING_PROVIDER": "fastembed",
+        "POSTGRES_ENABLED": "false"
+      }
+    }
+  }
+}

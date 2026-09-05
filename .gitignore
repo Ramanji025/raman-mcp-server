@@ -1,0 +1,32 @@
+# Byte-compiled / caches
+__pycache__/
+*.py[cod]
+*.egg-info/
+src/mcp_microservices_kb.egg-info/
+.eggs/
+build/
+dist/
+
+# Env
+.env
+.venv/
+venv/
+
+# Data (repos, indexes, caches, online-learning memory)
+data/repos/
+data/learning/
+!data/.gitkeep
+install_log.txt
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+README.md

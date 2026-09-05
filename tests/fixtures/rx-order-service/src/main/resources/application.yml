@@ -1,0 +1,13 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: rx-order-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/rx_orders
+  kafka:
+    consumer:
+      topics: payment.completed
+    producer:
+      topic: order.fulfilled

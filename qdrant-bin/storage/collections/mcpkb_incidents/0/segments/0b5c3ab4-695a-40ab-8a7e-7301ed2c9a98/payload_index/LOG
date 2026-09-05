@@ -1,0 +1,787 @@
+2026/08/04-23:04:03.067471 1af4 RocksDB version: 9.9.3
+2026/08/04-23:04:03.067535 1af4 Compile date 2024-12-05 01:25:31
+2026/08/04-23:04:03.067552 1af4 DB SUMMARY
+2026/08/04-23:04:03.067565 1af4 Host name (Env):  BHQBHPVKHCRQWLQ
+2026/08/04-23:04:03.067592 1af4 DB Session ID:  A5YGUMZOVM40PJ2NDW5M
+2026/08/04-23:04:03.068530 1af4 CURRENT file:  CURRENT
+2026/08/04-23:04:03.068570 1af4 IDENTITY file:  IDENTITY
+2026/08/04-23:04:03.068674 1af4 MANIFEST file:  MANIFEST-000005 size: 363 Bytes
+2026/08/04-23:04:03.068687 1af4 SST files in ./storage\collections\mcpkb_incidents\0\segments\0b5c3ab4-695a-40ab-8a7e-7301ed2c9a98\payload_index dir, Total Num: 0, files: 
+2026/08/04-23:04:03.068697 1af4 Write Ahead Log file in ./storage\collections\mcpkb_incidents\0\segments\0b5c3ab4-695a-40ab-8a7e-7301ed2c9a98\payload_index: 000004.log size: 0 ; 
+2026/08/04-23:04:03.068851 1af4                         Options.error_if_exists: 0
+2026/08/04-23:04:03.068858 1af4                       Options.create_if_missing: 1
+2026/08/04-23:04:03.068861 1af4                         Options.paranoid_checks: 1
+2026/08/04-23:04:03.068865 1af4             Options.flush_verify_memtable_count: 1
+2026/08/04-23:04:03.068869 1af4          Options.compaction_verify_record_count: 1
+2026/08/04-23:04:03.068872 1af4                               Options.track_and_verify_wals_in_manifest: 0
+2026/08/04-23:04:03.068876 1af4        Options.verify_sst_unique_id_in_manifest: 1
+2026/08/04-23:04:03.068880 1af4                                     Options.env: 000001D40AC445D0
+2026/08/04-23:04:03.068884 1af4                                      Options.fs: WinFS
+2026/08/04-23:04:03.068888 1af4                                Options.info_log: 000001D45F522920
+2026/08/04-23:04:03.068892 1af4                Options.max_file_opening_threads: 16
+2026/08/04-23:04:03.068895 1af4                              Options.statistics: 0000000000000000
+2026/08/04-23:04:03.068899 1af4                               Options.use_fsync: 0
+2026/08/04-23:04:03.068903 1af4                       Options.max_log_file_size: 1048576
+2026/08/04-23:04:03.068907 1af4                  Options.max_manifest_file_size: 1073741824
+2026/08/04-23:04:03.068911 1af4                   Options.log_file_time_to_roll: 0
+2026/08/04-23:04:03.068914 1af4                       Options.keep_log_file_num: 1
+2026/08/04-23:04:03.068917 1af4                    Options.recycle_log_file_num: 0
+2026/08/04-23:04:03.068921 1af4                         Options.allow_fallocate: 1
+2026/08/04-23:04:03.068925 1af4                        Options.allow_mmap_reads: 0
+2026/08/04-23:04:03.068928 1af4                       Options.allow_mmap_writes: 0
+2026/08/04-23:04:03.068931 1af4                        Options.use_direct_reads: 0
+2026/08/04-23:04:03.068935 1af4                        Options.use_direct_io_for_flush_and_compaction: 0
+2026/08/04-23:04:03.068938 1af4          Options.create_missing_column_families: 1
+2026/08/04-23:04:03.068942 1af4                              Options.db_log_dir: 
+2026/08/04-23:04:03.068950 1af4                                 Options.wal_dir: 
+2026/08/04-23:04:03.068953 1af4                Options.table_cache_numshardbits: 6
+2026/08/04-23:04:03.068956 1af4                         Options.WAL_ttl_seconds: 0
+2026/08/04-23:04:03.068959 1af4                       Options.WAL_size_limit_MB: 0
+2026/08/04-23:04:03.068963 1af4                        Options.max_write_batch_group_size_bytes: 1048576
+2026/08/04-23:04:03.068966 1af4             Options.manifest_preallocation_size: 4194304
+2026/08/04-23:04:03.068970 1af4                     Options.is_fd_close_on_exec: 1
+2026/08/04-23:04:03.068973 1af4                   Options.advise_random_on_open: 1
+2026/08/04-23:04:03.068977 1af4                    Options.db_write_buffer_size: 0
+2026/08/04-23:04:03.068981 1af4                    Options.write_buffer_manager: 000001D44971A4A0
+2026/08/04-23:04:03.068985 1af4           Options.random_access_max_buffer_size: 1048576
+2026/08/04-23:04:03.068988 1af4                      Options.use_adaptive_mutex: 0
+2026/08/04-23:04:03.068992 1af4                            Options.rate_limiter: 0000000000000000
+2026/08/04-23:04:03.069014 1af4     Options.sst_file_manager.rate_bytes_per_sec: 0
+2026/08/04-23:04:03.069020 1af4                       Options.wal_recovery_mode: 0
+2026/08/04-23:04:03.069024 1af4                  Options.enable_thread_tracking: 0
+2026/08/04-23:04:03.069027 1af4                  Options.enable_pipelined_write: 0
+2026/08/04-23:04:03.069031 1af4                  Options.unordered_write: 0
+2026/08/04-23:04:03.069035 1af4         Options.allow_concurrent_memtable_write: 1
+2026/08/04-23:04:03.069038 1af4      Options.enable_write_thread_adaptive_yield: 1
+2026/08/04-23:04:03.069042 1af4             Options.write_thread_max_yield_usec: 100
+2026/08/04-23:04:03.069046 1af4            Options.write_thread_slow_yield_usec: 3
+2026/08/04-23:04:03.069050 1af4                               Options.row_cache: None
+2026/08/04-23:04:03.069053 1af4                              Options.wal_filter: None
+2026/08/04-23:04:03.069057 1af4             Options.avoid_flush_during_recovery: 0
+2026/08/04-23:04:03.069060 1af4             Options.allow_ingest_behind: 0
+2026/08/04-23:04:03.069064 1af4             Options.two_write_queues: 0
+2026/08/04-23:04:03.069067 1af4             Options.manual_wal_flush: 0
+2026/08/04-23:04:03.069071 1af4             Options.wal_compression: 0
+2026/08/04-23:04:03.069074 1af4             Options.background_close_inactive_wals: 0
+2026/08/04-23:04:03.069078 1af4             Options.atomic_flush: 0
+2026/08/04-23:04:03.069081 1af4             Options.avoid_unnecessary_blocking_io: 0
+2026/08/04-23:04:03.069084 1af4             Options.prefix_seek_opt_in_only: 0
+2026/08/04-23:04:03.069087 1af4                 Options.persist_stats_to_disk: 0
+2026/08/04-23:04:03.069091 1af4                 Options.write_dbid_to_manifest: 1
+2026/08/04-23:04:03.069095 1af4                 Options.write_identity_file: 1
+2026/08/04-23:04:03.069098 1af4                 Options.log_readahead_size: 0
+2026/08/04-23:04:03.069102 1af4                 Options.file_checksum_gen_factory: Unknown
+2026/08/04-23:04:03.069106 1af4                 Options.best_efforts_recovery: 0
+2026/08/04-23:04:03.069109 1af4                Options.max_bgerror_resume_count: 2147483647
+2026/08/04-23:04:03.069113 1af4            Options.bgerror_resume_retry_interval: 1000000
+2026/08/04-23:04:03.069117 1af4             Options.allow_data_in_errors: 0
+2026/08/04-23:04:03.069120 1af4             Options.db_host_id: __hostname__
+2026/08/04-23:04:03.069124 1af4             Options.enforce_single_del_contracts: true
+2026/08/04-23:04:03.069128 1af4             Options.metadata_write_temperature: kUnknown
+2026/08/04-23:04:03.069131 1af4             Options.wal_write_temperature: kUnknown
+2026/08/04-23:04:03.069135 1af4             Options.max_background_jobs: 2
+2026/08/04-23:04:03.069138 1af4             Options.max_background_compactions: -1
+2026/08/04-23:04:03.069142 1af4             Options.max_subcompactions: 1
+2026/08/04-23:04:03.069146 1af4             Options.avoid_flush_during_shutdown: 0
+2026/08/04-23:04:03.069150 1af4           Options.writable_file_max_buffer_size: 1048576
+2026/08/04-23:04:03.069153 1af4             Options.delayed_write_rate : 16777216
+2026/08/04-23:04:03.069172 1af4             Options.max_total_wal_size: 0
+2026/08/04-23:04:03.069181 1af4             Options.delete_obsolete_files_period_micros: 180000000
+2026/08/04-23:04:03.069186 1af4                   Options.stats_dump_period_sec: 600
+2026/08/04-23:04:03.069190 1af4                 Options.stats_persist_period_sec: 600
+2026/08/04-23:04:03.069194 1af4                 Options.stats_history_buffer_size: 1048576
+2026/08/04-23:04:03.069198 1af4                          Options.max_open_files: 256
+2026/08/04-23:04:03.069202 1af4                          Options.bytes_per_sync: 0
+2026/08/04-23:04:03.069206 1af4                      Options.wal_bytes_per_sync: 0
+2026/08/04-23:04:03.069212 1af4                   Options.strict_bytes_per_sync: 0
+2026/08/04-23:04:03.069215 1af4       Options.compaction_readahead_size: 2097152
+2026/08/04-23:04:03.069262 1af4                  Options.max_background_flushes: -1
+2026/08/04-23:04:03.069270 1af4 Options.daily_offpeak_time_utc: 
+2026/08/04-23:04:03.069275 1af4 Compression algorithms supported:
+2026/08/04-23:04:03.069280 1af4 	kZSTD supported: 0
+2026/08/04-23:04:03.069284 1af4 	kSnappyCompression supported: 1
+2026/08/04-23:04:03.069287 1af4 	kBZip2Compression supported: 0
+2026/08/04-23:04:03.069291 1af4 	kZlibCompression supported: 0
+2026/08/04-23:04:03.069295 1af4 	kLZ4Compression supported: 1
+2026/08/04-23:04:03.069298 1af4 	kXpressCompression supported: 0
+2026/08/04-23:04:03.069302 1af4 	kLZ4HCCompression supported: 1
+2026/08/04-23:04:03.069305 1af4 	kZSTDNotFinalCompression supported: 0
+2026/08/04-23:04:03.069309 1af4 Fast CRC32 supported: Not supported on x86
+2026/08/04-23:04:03.069313 1af4 DMutex implementation: std::mutex
+2026/08/04-23:04:03.069317 1af4 Jemalloc supported: 0
+2026/08/04-23:04:03.071260 1af4               Options.comparator: leveldb.BytewiseComparator
+2026/08/04-23:04:03.071279 1af4           Options.merge_operator: None
+2026/08/04-23:04:03.071286 1af4        Options.compaction_filter: None
+2026/08/04-23:04:03.071291 1af4        Options.compaction_filter_factory: None
+2026/08/04-23:04:03.071297 1af4  Options.sst_partitioner_factory: None
+2026/08/04-23:04:03.071302 1af4         Options.memtable_factory: SkipListFactory
+2026/08/04-23:04:03.071307 1af4            Options.table_factory: BlockBasedTable
+2026/08/04-23:04:03.071325 1af4            table_factory options:   flush_block_policy_factory: FlushBlockBySizePolicyFactory (000001D4273C6B80)
+  cache_index_and_filter_blocks: 0
+  cache_index_and_filter_blocks_with_high_priority: 1
+  pin_l0_filter_and_index_blocks_in_cache: 0
+  pin_top_level_index_and_filter: 1
+  index_type: 0
+  data_block_index_type: 0
+  index_shortening: 1
+  data_block_hash_table_util_ratio: 0.750000
+  checksum: 4
+  no_block_cache: 0
+  block_cache: 000001D47D12A110
+  block_cache_name: LRUCache
+  block_cache_options:
+    capacity : 33554432
+    num_shard_bits : 6
+    strict_capacity_limit : 0
+    memory_allocator : None
+    high_pri_pool_ratio: 0.500
+    low_pri_pool_ratio: 0.000
+  persistent_cache: 0000000000000000
+  block_size: 4096
+  block_size_deviation: 10
+  block_restart_interval: 16
+  index_block_restart_interval: 1
+  metadata_block_size: 4096
+  partition_filters: 0
+  use_delta_encoding: 1
+  filter_policy: nullptr
+  whole_key_filtering: 1
+  verify_compression: 0
+  read_amp_bytes_per_bit: 0
+  format_version: 6
+  enable_index_compression: 1
+  block_align: 0
+  max_auto_readahead_size: 262144
+  prepopulate_block_cache: 0
+  initial_auto_readahead_size: 8192
+  num_file_reads_for_auto_readahead: 2
+2026/08/04-23:04:03.071334 1af4        Options.write_buffer_size: 10485760
+2026/08/04-23:04:03.071341 1af4  Options.max_write_buffer_number: 2
+2026/08/04-23:04:03.071346 1af4          Options.compression: LZ4
+2026/08/04-23:04:03.071352 1af4                  Options.bottommost_compression: Disabled
+2026/08/04-23:04:03.071358 1af4       Options.prefix_extractor: nullptr
+2026/08/04-23:04:03.071364 1af4   Options.memtable_insert_with_hint_prefix_extractor: nullptr
+2026/08/04-23:04:03.071369 1af4             Options.num_levels: 7
+2026/08/04-23:04:03.071375 1af4        Options.min_write_buffer_number_to_merge: 1
+2026/08/04-23:04:03.071380 1af4     Options.max_write_buffer_number_to_maintain: 0
+2026/08/04-23:04:03.071385 1af4     Options.max_write_buffer_size_to_maintain: 0
+2026/08/04-23:04:03.071391 1af4            Options.bottommost_compression_opts.window_bits: -14
+2026/08/04-23:04:03.071396 1af4                  Options.bottommost_compression_opts.level: 32767
+2026/08/04-23:04:03.071402 1af4               Options.bottommost_compression_opts.strategy: 0
+2026/08/04-23:04:03.071407 1af4         Options.bottommost_compression_opts.max_dict_bytes: 0
+2026/08/04-23:04:03.071412 1af4         Options.bottommost_compression_opts.zstd_max_train_bytes: 0
+2026/08/04-23:04:03.071418 1af4         Options.bottommost_compression_opts.parallel_threads: 1
+2026/08/04-23:04:03.071423 1af4                  Options.bottommost_compression_opts.enabled: false
+2026/08/04-23:04:03.071433 1af4         Options.bottommost_compression_opts.max_dict_buffer_bytes: 0
+2026/08/04-23:04:03.071441 1af4         Options.bottommost_compression_opts.use_zstd_dict_trainer: true
+2026/08/04-23:04:03.071447 1af4            Options.compression_opts.window_bits: -14
+2026/08/04-23:04:03.071452 1af4                  Options.compression_opts.level: 32767
+2026/08/04-23:04:03.071457 1af4               Options.compression_opts.strategy: 0
+2026/08/04-23:04:03.071464 1af4         Options.compression_opts.max_dict_bytes: 0
+2026/08/04-23:04:03.071470 1af4         Options.compression_opts.zstd_max_train_bytes: 0
+2026/08/04-23:04:03.071476 1af4         Options.compression_opts.use_zstd_dict_trainer: true
+2026/08/04-23:04:03.071482 1af4         Options.compression_opts.parallel_threads: 1
+2026/08/04-23:04:03.071487 1af4                  Options.compression_opts.enabled: false
+2026/08/04-23:04:03.071493 1af4         Options.compression_opts.max_dict_buffer_bytes: 0
+2026/08/04-23:04:03.071499 1af4      Options.level0_file_num_compaction_trigger: 4
+2026/08/04-23:04:03.071505 1af4          Options.level0_slowdown_writes_trigger: 20
+2026/08/04-23:04:03.071510 1af4              Options.level0_stop_writes_trigger: 36
+2026/08/04-23:04:03.071516 1af4                   Options.target_file_size_base: 67108864
+2026/08/04-23:04:03.071521 1af4             Options.target_file_size_multiplier: 1
+2026/08/04-23:04:03.071527 1af4                Options.max_bytes_for_level_base: 268435456
+2026/08/04-23:04:03.071533 1af4 Options.level_compaction_dynamic_level_bytes: 1
+2026/08/04-23:04:03.071539 1af4          Options.max_bytes_for_level_multiplier: 10.000000
+2026/08/04-23:04:03.071545 1af4 Options.max_bytes_for_level_multiplier_addtl[0]: 1
+2026/08/04-23:04:03.071550 1af4 Options.max_bytes_for_level_multiplier_addtl[1]: 1
+2026/08/04-23:04:03.071556 1af4 Options.max_bytes_for_level_multiplier_addtl[2]: 1
+2026/08/04-23:04:03.071562 1af4 Options.max_bytes_for_level_multiplier_addtl[3]: 1
+2026/08/04-23:04:03.071568 1af4 Options.max_bytes_for_level_multiplier_addtl[4]: 1
+2026/08/04-23:04:03.071573 1af4 Options.max_bytes_for_level_multiplier_addtl[5]: 1
+2026/08/04-23:04:03.071579 1af4 Options.max_bytes_for_level_multiplier_addtl[6]: 1
+2026/08/04-23:04:03.071584 1af4       Options.max_sequential_skip_in_iterations: 8
+2026/08/04-23:04:03.071590 1af4                    Options.max_compaction_bytes: 1677721600
+2026/08/04-23:04:03.071596 1af4                        Options.arena_block_size: 1048576
+2026/08/04-23:04:03.071603 1af4   Options.soft_pending_compaction_bytes_limit: 68719476736
+2026/08/04-23:04:03.071610 1af4   Options.hard_pending_compaction_bytes_limit: 274877906944
+2026/08/04-23:04:03.071617 1af4                Options.disable_auto_compactions: 0
+2026/08/04-23:04:03.071624 1af4                        Options.compaction_style: kCompactionStyleLevel
+2026/08/04-23:04:03.071630 1af4                          Options.compaction_pri: kMinOverlappingRatio
+2026/08/04-23:04:03.071636 1af4 Options.compaction_options_universal.size_ratio: 1
+2026/08/04-23:04:03.071642 1af4 Options.compaction_options_universal.min_merge_width: 2
+2026/08/04-23:04:03.071649 1af4 Options.compaction_options_universal.max_merge_width: 4294967295
+2026/08/04-23:04:03.071656 1af4 Options.compaction_options_universal.max_size_amplification_percent: 200
+2026/08/04-23:04:03.071662 1af4 Options.compaction_options_universal.compression_size_percent: -1
+2026/08/04-23:04:03.071668 1af4 Options.compaction_options_universal.stop_style: kCompactionStopStyleTotalSize
+2026/08/04-23:04:03.071674 1af4 Options.compaction_options_universal.max_read_amp: -1
+2026/08/04-23:04:03.071679 1af4 Options.compaction_options_fifo.max_table_files_size: 1073741824
+2026/08/04-23:04:03.071685 1af4 Options.compaction_options_fifo.allow_compaction: 0
+2026/08/04-23:04:03.071692 1af4                   Options.table_properties_collectors: 
+2026/08/04-23:04:03.071697 1af4                   Options.inplace_update_support: 0
+2026/08/04-23:04:03.071703 1af4                 Options.inplace_update_num_locks: 10000
+2026/08/04-23:04:03.071762 1af4               Options.memtable_prefix_bloom_size_ratio: 0.000000
+2026/08/04-23:04:03.071771 1af4               Options.memtable_whole_key_filtering: 0
+2026/08/04-23:04:03.071777 1af4   Options.memtable_huge_page_size: 0
+2026/08/04-23:04:03.071783 1af4                           Options.bloom_locality: 0
+2026/08/04-23:04:03.071789 1af4                    Options.max_successive_merges: 0
+2026/08/04-23:04:03.071795 1af4             Options.strict_max_successive_merges: 0
+2026/08/04-23:04:03.071800 1af4                Options.optimize_filters_for_hits: 0
+2026/08/04-23:04:03.071806 1af4                Options.paranoid_file_checks: 0
+2026/08/04-23:04:03.071812 1af4                Options.force_consistency_checks: 1
+2026/08/04-23:04:03.071817 1af4                Options.report_bg_io_stats: 0
+2026/08/04-23:04:03.071823 1af4                               Options.ttl: 2592000
+2026/08/04-23:04:03.071829 1af4          Options.periodic_compaction_seconds: 0
+2026/08/04-23:04:03.071835 1af4                        Options.default_temperature: kUnknown
+2026/08/04-23:04:03.071840 1af4  Options.preclude_last_level_data_seconds: 0
+2026/08/04-23:04:03.071846 1af4    Options.preserve_internal_time_seconds: 0
+2026/08/04-23:04:03.071851 1af4                       Options.enable_blob_files: false
+2026/08/04-23:04:03.071857 1af4                           Options.min_blob_size: 0
+2026/08/04-23:04:03.071862 1af4                          Options.blob_file_size: 268435456
+2026/08/04-23:04:03.071869 1af4                   Options.blob_compression_type: NoCompression
+2026/08/04-23:04:03.071874 1af4          Options.enable_blob_garbage_collection: false
+2026/08/04-23:04:03.071881 1af4      Options.blob_garbage_collection_age_cutoff: 0.250000
+2026/08/04-23:04:03.071887 1af4 Options.blob_garbage_collection_force_threshold: 1.000000
+2026/08/04-23:04:03.071894 1af4          Options.blob_compaction_readahead_size: 0
+2026/08/04-23:04:03.071899 1af4                Options.blob_file_starting_level: 0
+2026/08/04-23:04:03.071905 1af4         Options.experimental_mempurge_threshold: 0.000000
+2026/08/04-23:04:03.071911 1af4            Options.memtable_max_range_deletions: 0
+2026/08/04-23:04:03.071998 1af4               Options.comparator: leveldb.BytewiseComparator
+2026/08/04-23:04:03.072014 1af4           Options.merge_operator: None
+2026/08/04-23:04:03.072020 1af4        Options.compaction_filter: None
+2026/08/04-23:04:03.072026 1af4        Options.compaction_filter_factory: None
+2026/08/04-23:04:03.072031 1af4  Options.sst_partitioner_factory: None
+2026/08/04-23:04:03.072037 1af4         Options.memtable_factory: SkipListFactory
+2026/08/04-23:04:03.072043 1af4            Options.table_factory: BlockBasedTable
+2026/08/04-23:04:03.072059 1af4            table_factory options:   flush_block_policy_factory: FlushBlockBySizePolicyFactory (000001D4273C6B80)
+  cache_index_and_filter_blocks: 0
+  cache_index_and_filter_blocks_with_high_priority: 1
+  pin_l0_filter_and_index_blocks_in_cache: 0
+  pin_top_level_index_and_filter: 1
+  index_type: 0
+  data_block_index_type: 0
+  index_shortening: 1
+  data_block_hash_table_util_ratio: 0.750000
+  checksum: 4
+  no_block_cache: 0
+  block_cache: 000001D47D12A110
+  block_cache_name: LRUCache
+  block_cache_options:
+    capacity : 33554432
+    num_shard_bits : 6
+    strict_capacity_limit : 0
+    memory_allocator : None
+    high_pri_pool_ratio: 0.500
+    low_pri_pool_ratio: 0.000
+  persistent_cache: 0000000000000000
+  block_size: 4096
+  block_size_deviation: 10
+  block_restart_interval: 16
+  index_block_restart_interval: 1
+  metadata_block_size: 4096
+  partition_filters: 0
+  use_delta_encoding: 1
+  filter_policy: nullptr
+  whole_key_filtering: 1
+  verify_compression: 0
+  read_amp_bytes_per_bit: 0
+  format_version: 6
+  enable_index_compression: 1
+  block_align: 0
+  max_auto_readahead_size: 262144
+  prepopulate_block_cache: 0
+  initial_auto_readahead_size: 8192
+  num_file_reads_for_auto_readahead: 2
+2026/08/04-23:04:03.072066 1af4        Options.write_buffer_size: 10485760
+2026/08/04-23:04:03.072081 1af4  Options.max_write_buffer_number: 2
+2026/08/04-23:04:03.072090 1af4          Options.compression: LZ4
+2026/08/04-23:04:03.072096 1af4                  Options.bottommost_compression: Disabled
+2026/08/04-23:04:03.072102 1af4       Options.prefix_extractor: nullptr
+2026/08/04-23:04:03.072108 1af4   Options.memtable_insert_with_hint_prefix_extractor: nullptr
+2026/08/04-23:04:03.072114 1af4             Options.num_levels: 7
+2026/08/04-23:04:03.072120 1af4        Options.min_write_buffer_number_to_merge: 1
+2026/08/04-23:04:03.072125 1af4     Options.max_write_buffer_number_to_maintain: 0
+2026/08/04-23:04:03.072131 1af4     Options.max_write_buffer_size_to_maintain: 0
+2026/08/04-23:04:03.072137 1af4            Options.bottommost_compression_opts.window_bits: -14
+2026/08/04-23:04:03.072143 1af4                  Options.bottommost_compression_opts.level: 32767
+2026/08/04-23:04:03.072149 1af4               Options.bottommost_compression_opts.strategy: 0
+2026/08/04-23:04:03.072157 1af4         Options.bottommost_compression_opts.max_dict_bytes: 0
+2026/08/04-23:04:03.072163 1af4         Options.bottommost_compression_opts.zstd_max_train_bytes: 0
+2026/08/04-23:04:03.072169 1af4         Options.bottommost_compression_opts.parallel_threads: 1
+2026/08/04-23:04:03.072174 1af4                  Options.bottommost_compression_opts.enabled: false
+2026/08/04-23:04:03.072180 1af4         Options.bottommost_compression_opts.max_dict_buffer_bytes: 0
+2026/08/04-23:04:03.072186 1af4         Options.bottommost_compression_opts.use_zstd_dict_trainer: true
+2026/08/04-23:04:03.072192 1af4            Options.compression_opts.window_bits: -14
+2026/08/04-23:04:03.072197 1af4                  Options.compression_opts.level: 32767
+2026/08/04-23:04:03.072203 1af4               Options.compression_opts.strategy: 0
+2026/08/04-23:04:03.072208 1af4         Options.compression_opts.max_dict_bytes: 0
+2026/08/04-23:04:03.072214 1af4         Options.compression_opts.zstd_max_train_bytes: 0
+2026/08/04-23:04:03.072220 1af4         Options.compression_opts.use_zstd_dict_trainer: true
+2026/08/04-23:04:03.072226 1af4         Options.compression_opts.parallel_threads: 1
+2026/08/04-23:04:03.072231 1af4                  Options.compression_opts.enabled: false
+2026/08/04-23:04:03.072237 1af4         Options.compression_opts.max_dict_buffer_bytes: 0
+2026/08/04-23:04:03.072243 1af4      Options.level0_file_num_compaction_trigger: 4
+2026/08/04-23:04:03.072249 1af4          Options.level0_slowdown_writes_trigger: 20
+2026/08/04-23:04:03.072254 1af4              Options.level0_stop_writes_trigger: 36
+2026/08/04-23:04:03.072260 1af4                   Options.target_file_size_base: 67108864
+2026/08/04-23:04:03.072266 1af4             Options.target_file_size_multiplier: 1
+2026/08/04-23:04:03.072272 1af4                Options.max_bytes_for_level_base: 268435456
+2026/08/04-23:04:03.072278 1af4 Options.level_compaction_dynamic_level_bytes: 1
+2026/08/04-23:04:03.072284 1af4          Options.max_bytes_for_level_multiplier: 10.000000
+2026/08/04-23:04:03.072290 1af4 Options.max_bytes_for_level_multiplier_addtl[0]: 1
+2026/08/04-23:04:03.072296 1af4 Options.max_bytes_for_level_multiplier_addtl[1]: 1
+2026/08/04-23:04:03.072302 1af4 Options.max_bytes_for_level_multiplier_addtl[2]: 1
+2026/08/04-23:04:03.072307 1af4 Options.max_bytes_for_level_multiplier_addtl[3]: 1
+2026/08/04-23:04:03.072313 1af4 Options.max_bytes_for_level_multiplier_addtl[4]: 1
+2026/08/04-23:04:03.072320 1af4 Options.max_bytes_for_level_multiplier_addtl[5]: 1
+2026/08/04-23:04:03.072325 1af4 Options.max_bytes_for_level_multiplier_addtl[6]: 1
+2026/08/04-23:04:03.072331 1af4       Options.max_sequential_skip_in_iterations: 8
+2026/08/04-23:04:03.072336 1af4                    Options.max_compaction_bytes: 1677721600
+2026/08/04-23:04:03.072342 1af4                        Options.arena_block_size: 1048576
+2026/08/04-23:04:03.072348 1af4   Options.soft_pending_compaction_bytes_limit: 68719476736
+2026/08/04-23:04:03.072354 1af4   Options.hard_pending_compaction_bytes_limit: 274877906944
+2026/08/04-23:04:03.072362 1af4                Options.disable_auto_compactions: 0
+2026/08/04-23:04:03.072369 1af4                        Options.compaction_style: kCompactionStyleLevel
+2026/08/04-23:04:03.072375 1af4                          Options.compaction_pri: kMinOverlappingRatio
+2026/08/04-23:04:03.072381 1af4 Options.compaction_options_universal.size_ratio: 1
+2026/08/04-23:04:03.072387 1af4 Options.compaction_options_universal.min_merge_width: 2
+2026/08/04-23:04:03.072393 1af4 Options.compaction_options_universal.max_merge_width: 4294967295
+2026/08/04-23:04:03.072399 1af4 Options.compaction_options_universal.max_size_amplification_percent: 200
+2026/08/04-23:04:03.072404 1af4 Options.compaction_options_universal.compression_size_percent: -1
+2026/08/04-23:04:03.072411 1af4 Options.compaction_options_universal.stop_style: kCompactionStopStyleTotalSize
+2026/08/04-23:04:03.072417 1af4 Options.compaction_options_universal.max_read_amp: -1
+2026/08/04-23:04:03.072423 1af4 Options.compaction_options_fifo.max_table_files_size: 1073741824
+2026/08/04-23:04:03.072429 1af4 Options.compaction_options_fifo.allow_compaction: 0
+2026/08/04-23:04:03.072435 1af4                   Options.table_properties_collectors: 
+2026/08/04-23:04:03.072441 1af4                   Options.inplace_update_support: 0
+2026/08/04-23:04:03.072447 1af4                 Options.inplace_update_num_locks: 10000
+2026/08/04-23:04:03.072452 1af4               Options.memtable_prefix_bloom_size_ratio: 0.000000
+2026/08/04-23:04:03.072461 1af4               Options.memtable_whole_key_filtering: 0
+2026/08/04-23:04:03.072467 1af4   Options.memtable_huge_page_size: 0
+2026/08/04-23:04:03.072473 1af4                           Options.bloom_locality: 0
+2026/08/04-23:04:03.072479 1af4                    Options.max_successive_merges: 0
+2026/08/04-23:04:03.072490 1af4             Options.strict_max_successive_merges: 0
+2026/08/04-23:04:03.072497 1af4                Options.optimize_filters_for_hits: 0
+2026/08/04-23:04:03.072502 1af4                Options.paranoid_file_checks: 0
+2026/08/04-23:04:03.072508 1af4                Options.force_consistency_checks: 1
+2026/08/04-23:04:03.072514 1af4                Options.report_bg_io_stats: 0
+2026/08/04-23:04:03.072523 1af4                               Options.ttl: 2592000
+2026/08/04-23:04:03.072533 1af4          Options.periodic_compaction_seconds: 0
+2026/08/04-23:04:03.072539 1af4                        Options.default_temperature: kUnknown
+2026/08/04-23:04:03.072545 1af4  Options.preclude_last_level_data_seconds: 0
+2026/08/04-23:04:03.072551 1af4    Options.preserve_internal_time_seconds: 0
+2026/08/04-23:04:03.072557 1af4                       Options.enable_blob_files: false
+2026/08/04-23:04:03.072566 1af4                           Options.min_blob_size: 0
+2026/08/04-23:04:03.072572 1af4                          Options.blob_file_size: 268435456
+2026/08/04-23:04:03.072578 1af4                   Options.blob_compression_type: NoCompression
+2026/08/04-23:04:03.072584 1af4          Options.enable_blob_garbage_collection: false
+2026/08/04-23:04:03.072590 1af4      Options.blob_garbage_collection_age_cutoff: 0.250000
+2026/08/04-23:04:03.072596 1af4 Options.blob_garbage_collection_force_threshold: 1.000000
+2026/08/04-23:04:03.072602 1af4          Options.blob_compaction_readahead_size: 0
+2026/08/04-23:04:03.072608 1af4                Options.blob_file_starting_level: 0
+2026/08/04-23:04:03.072613 1af4         Options.experimental_mempurge_threshold: 0.000000
+2026/08/04-23:04:03.072619 1af4            Options.memtable_max_range_deletions: 0
+2026/08/04-23:04:03.072676 1af4               Options.comparator: leveldb.BytewiseComparator
+2026/08/04-23:04:03.072683 1af4           Options.merge_operator: None
+2026/08/04-23:04:03.072689 1af4        Options.compaction_filter: None
+2026/08/04-23:04:03.072695 1af4        Options.compaction_filter_factory: None
+2026/08/04-23:04:03.072701 1af4  Options.sst_partitioner_factory: None
+2026/08/04-23:04:03.072706 1af4         Options.memtable_factory: SkipListFactory
+2026/08/04-23:04:03.072711 1af4            Options.table_factory: BlockBasedTable
+2026/08/04-23:04:03.072735 1af4            table_factory options:   flush_block_policy_factory: FlushBlockBySizePolicyFactory (000001D4273C6B80)
+  cache_index_and_filter_blocks: 0
+  cache_index_and_filter_blocks_with_high_priority: 1
+  pin_l0_filter_and_index_blocks_in_cache: 0
+  pin_top_level_index_and_filter: 1
+  index_type: 0
+  data_block_index_type: 0
+  index_shortening: 1
+  data_block_hash_table_util_ratio: 0.750000
+  checksum: 4
+  no_block_cache: 0
+  block_cache: 000001D47D12A110
+  block_cache_name: LRUCache
+  block_cache_options:
+    capacity : 33554432
+    num_shard_bits : 6
+    strict_capacity_limit : 0
+    memory_allocator : None
+    high_pri_pool_ratio: 0.500
+    low_pri_pool_ratio: 0.000
+  persistent_cache: 0000000000000000
+  block_size: 4096
+  block_size_deviation: 10
+  block_restart_interval: 16
+  index_block_restart_interval: 1
+  metadata_block_size: 4096
+  partition_filters: 0
+  use_delta_encoding: 1
+  filter_policy: nullptr
+  whole_key_filtering: 1
+  verify_compression: 0
+  read_amp_bytes_per_bit: 0
+  format_version: 6
+  enable_index_compression: 1
+  block_align: 0
+  max_auto_readahead_size: 262144
+  prepopulate_block_cache: 0
+  initial_auto_readahead_size: 8192
+  num_file_reads_for_auto_readahead: 2
+2026/08/04-23:04:03.072749 1af4        Options.write_buffer_size: 10485760
+2026/08/04-23:04:03.072754 1af4  Options.max_write_buffer_number: 2
+2026/08/04-23:04:03.072760 1af4          Options.compression: LZ4
+2026/08/04-23:04:03.072766 1af4                  Options.bottommost_compression: Disabled
+2026/08/04-23:04:03.072772 1af4       Options.prefix_extractor: nullptr
+2026/08/04-23:04:03.072778 1af4   Options.memtable_insert_with_hint_prefix_extractor: nullptr
+2026/08/04-23:04:03.072783 1af4             Options.num_levels: 7
+2026/08/04-23:04:03.072790 1af4        Options.min_write_buffer_number_to_merge: 1
+2026/08/04-23:04:03.072795 1af4     Options.max_write_buffer_number_to_maintain: 0
+2026/08/04-23:04:03.072801 1af4     Options.max_write_buffer_size_to_maintain: 0
+2026/08/04-23:04:03.072807 1af4            Options.bottommost_compression_opts.window_bits: -14
+2026/08/04-23:04:03.072814 1af4                  Options.bottommost_compression_opts.level: 32767
+2026/08/04-23:04:03.072820 1af4               Options.bottommost_compression_opts.strategy: 0
+2026/08/04-23:04:03.072830 1af4         Options.bottommost_compression_opts.max_dict_bytes: 0
+2026/08/04-23:04:03.072836 1af4         Options.bottommost_compression_opts.zstd_max_train_bytes: 0
+2026/08/04-23:04:03.072842 1af4         Options.bottommost_compression_opts.parallel_threads: 1
+2026/08/04-23:04:03.072849 1af4                  Options.bottommost_compression_opts.enabled: false
+2026/08/04-23:04:03.072854 1af4         Options.bottommost_compression_opts.max_dict_buffer_bytes: 0
+2026/08/04-23:04:03.072860 1af4         Options.bottommost_compression_opts.use_zstd_dict_trainer: true
+2026/08/04-23:04:03.072867 1af4            Options.compression_opts.window_bits: -14
+2026/08/04-23:04:03.072873 1af4                  Options.compression_opts.level: 32767
+2026/08/04-23:04:03.072878 1af4               Options.compression_opts.strategy: 0
+2026/08/04-23:04:03.072884 1af4         Options.compression_opts.max_dict_bytes: 0
+2026/08/04-23:04:03.072890 1af4         Options.compression_opts.zstd_max_train_bytes: 0
+2026/08/04-23:04:03.072898 1af4         Options.compression_opts.use_zstd_dict_trainer: true
+2026/08/04-23:04:03.072904 1af4         Options.compression_opts.parallel_threads: 1
+2026/08/04-23:04:03.072909 1af4                  Options.compression_opts.enabled: false
+2026/08/04-23:04:03.072915 1af4         Options.compression_opts.max_dict_buffer_bytes: 0
+2026/08/04-23:04:03.072921 1af4      Options.level0_file_num_compaction_trigger: 4
+2026/08/04-23:04:03.072927 1af4          Options.level0_slowdown_writes_trigger: 20
+2026/08/04-23:04:03.072932 1af4              Options.level0_stop_writes_trigger: 36
+2026/08/04-23:04:03.072938 1af4                   Options.target_file_size_base: 67108864
+2026/08/04-23:04:03.072944 1af4             Options.target_file_size_multiplier: 1
+2026/08/04-23:04:03.072999 1af4                Options.max_bytes_for_level_base: 268435456
+2026/08/04-23:04:03.073009 1af4 Options.level_compaction_dynamic_level_bytes: 1
+2026/08/04-23:04:03.073014 1af4          Options.max_bytes_for_level_multiplier: 10.000000
+2026/08/04-23:04:03.073019 1af4 Options.max_bytes_for_level_multiplier_addtl[0]: 1
+2026/08/04-23:04:03.073023 1af4 Options.max_bytes_for_level_multiplier_addtl[1]: 1
+2026/08/04-23:04:03.073027 1af4 Options.max_bytes_for_level_multiplier_addtl[2]: 1
+2026/08/04-23:04:03.073031 1af4 Options.max_bytes_for_level_multiplier_addtl[3]: 1
+2026/08/04-23:04:03.073035 1af4 Options.max_bytes_for_level_multiplier_addtl[4]: 1
+2026/08/04-23:04:03.073038 1af4 Options.max_bytes_for_level_multiplier_addtl[5]: 1
+2026/08/04-23:04:03.073042 1af4 Options.max_bytes_for_level_multiplier_addtl[6]: 1
+2026/08/04-23:04:03.073046 1af4       Options.max_sequential_skip_in_iterations: 8
+2026/08/04-23:04:03.073050 1af4                    Options.max_compaction_bytes: 1677721600
+2026/08/04-23:04:03.073054 1af4                        Options.arena_block_size: 1048576
+2026/08/04-23:04:03.073058 1af4   Options.soft_pending_compaction_bytes_limit: 68719476736
+2026/08/04-23:04:03.073062 1af4   Options.hard_pending_compaction_bytes_limit: 274877906944
+2026/08/04-23:04:03.073066 1af4                Options.disable_auto_compactions: 0
+2026/08/04-23:04:03.073070 1af4                        Options.compaction_style: kCompactionStyleLevel
+2026/08/04-23:04:03.073075 1af4                          Options.compaction_pri: kMinOverlappingRatio
+2026/08/04-23:04:03.073079 1af4 Options.compaction_options_universal.size_ratio: 1
+2026/08/04-23:04:03.073083 1af4 Options.compaction_options_universal.min_merge_width: 2
+2026/08/04-23:04:03.073087 1af4 Options.compaction_options_universal.max_merge_width: 4294967295
+2026/08/04-23:04:03.073091 1af4 Options.compaction_options_universal.max_size_amplification_percent: 200
+2026/08/04-23:04:03.073095 1af4 Options.compaction_options_universal.compression_size_percent: -1
+2026/08/04-23:04:03.073099 1af4 Options.compaction_options_universal.stop_style: kCompactionStopStyleTotalSize
+2026/08/04-23:04:03.073104 1af4 Options.compaction_options_universal.max_read_amp: -1
+2026/08/04-23:04:03.073108 1af4 Options.compaction_options_fifo.max_table_files_size: 1073741824
+2026/08/04-23:04:03.073112 1af4 Options.compaction_options_fifo.allow_compaction: 0
+2026/08/04-23:04:03.073117 1af4                   Options.table_properties_collectors: 
+2026/08/04-23:04:03.073121 1af4                   Options.inplace_update_support: 0
+2026/08/04-23:04:03.073125 1af4                 Options.inplace_update_num_locks: 10000
+2026/08/04-23:04:03.073129 1af4               Options.memtable_prefix_bloom_size_ratio: 0.000000
+2026/08/04-23:04:03.073133 1af4               Options.memtable_whole_key_filtering: 0
+2026/08/04-23:04:03.073137 1af4   Options.memtable_huge_page_size: 0
+2026/08/04-23:04:03.073141 1af4                           Options.bloom_locality: 0
+2026/08/04-23:04:03.073145 1af4                    Options.max_successive_merges: 0
+2026/08/04-23:04:03.073148 1af4             Options.strict_max_successive_merges: 0
+2026/08/04-23:04:03.073152 1af4                Options.optimize_filters_for_hits: 0
+2026/08/04-23:04:03.073156 1af4                Options.paranoid_file_checks: 0
+2026/08/04-23:04:03.073159 1af4                Options.force_consistency_checks: 1
+2026/08/04-23:04:03.073163 1af4                Options.report_bg_io_stats: 0
+2026/08/04-23:04:03.073166 1af4                               Options.ttl: 2592000
+2026/08/04-23:04:03.073170 1af4          Options.periodic_compaction_seconds: 0
+2026/08/04-23:04:03.073173 1af4                        Options.default_temperature: kUnknown
+2026/08/04-23:04:03.073178 1af4  Options.preclude_last_level_data_seconds: 0
+2026/08/04-23:04:03.073181 1af4    Options.preserve_internal_time_seconds: 0
+2026/08/04-23:04:03.073185 1af4                       Options.enable_blob_files: false
+2026/08/04-23:04:03.073189 1af4                           Options.min_blob_size: 0
+2026/08/04-23:04:03.073194 1af4                          Options.blob_file_size: 268435456
+2026/08/04-23:04:03.073199 1af4                   Options.blob_compression_type: NoCompression
+2026/08/04-23:04:03.073204 1af4          Options.enable_blob_garbage_collection: false
+2026/08/04-23:04:03.073208 1af4      Options.blob_garbage_collection_age_cutoff: 0.250000
+2026/08/04-23:04:03.073213 1af4 Options.blob_garbage_collection_force_threshold: 1.000000
+2026/08/04-23:04:03.073217 1af4          Options.blob_compaction_readahead_size: 0
+2026/08/04-23:04:03.073220 1af4                Options.blob_file_starting_level: 0
+2026/08/04-23:04:03.073225 1af4         Options.experimental_mempurge_threshold: 0.000000
+2026/08/04-23:04:03.073229 1af4            Options.memtable_max_range_deletions: 0
+2026/08/04-23:04:03.073299 1af4               Options.comparator: leveldb.BytewiseComparator
+2026/08/04-23:04:03.073304 1af4           Options.merge_operator: None
+2026/08/04-23:04:03.073308 1af4        Options.compaction_filter: None
+2026/08/04-23:04:03.073312 1af4        Options.compaction_filter_factory: None
+2026/08/04-23:04:03.073315 1af4  Options.sst_partitioner_factory: None
+2026/08/04-23:04:03.073319 1af4         Options.memtable_factory: SkipListFactory
+2026/08/04-23:04:03.073322 1af4            Options.table_factory: BlockBasedTable
+2026/08/04-23:04:03.073349 1af4            table_factory options:   flush_block_policy_factory: FlushBlockBySizePolicyFactory (000001D4273C6B80)
+  cache_index_and_filter_blocks: 0
+  cache_index_and_filter_blocks_with_high_priority: 1
+  pin_l0_filter_and_index_blocks_in_cache: 0
+  pin_top_level_index_and_filter: 1
+  index_type: 0
+  data_block_index_type: 0
+  index_shortening: 1
+  data_block_hash_table_util_ratio: 0.750000
+  checksum: 4
+  no_block_cache: 0
+  block_cache: 000001D47D12A110
+  block_cache_name: LRUCache
+  block_cache_options:
+    capacity : 33554432
+    num_shard_bits : 6
+    strict_capacity_limit : 0
+    memory_allocator : None
+    high_pri_pool_ratio: 0.500
+    low_pri_pool_ratio: 0.000
+  persistent_cache: 0000000000000000
+  block_size: 4096
+  block_size_deviation: 10
+  block_restart_interval: 16
+  index_block_restart_interval: 1
+  metadata_block_size: 4096
+  partition_filters: 0
+  use_delta_encoding: 1
+  filter_policy: nullptr
+  whole_key_filtering: 1
+  verify_compression: 0
+  read_amp_bytes_per_bit: 0
+  format_version: 6
+  enable_index_compression: 1
+  block_align: 0
+  max_auto_readahead_size: 262144
+  prepopulate_block_cache: 0
+  initial_auto_readahead_size: 8192
+  num_file_reads_for_auto_readahead: 2
+2026/08/04-23:04:03.073359 1af4        Options.write_buffer_size: 10485760
+2026/08/04-23:04:03.073363 1af4  Options.max_write_buffer_number: 2
+2026/08/04-23:04:03.073369 1af4          Options.compression: LZ4
+2026/08/04-23:04:03.073373 1af4                  Options.bottommost_compression: Disabled
+2026/08/04-23:04:03.073385 1af4       Options.prefix_extractor: nullptr
+2026/08/04-23:04:03.073389 1af4   Options.memtable_insert_with_hint_prefix_extractor: nullptr
+2026/08/04-23:04:03.073392 1af4             Options.num_levels: 7
+2026/08/04-23:04:03.073396 1af4        Options.min_write_buffer_number_to_merge: 1
+2026/08/04-23:04:03.073400 1af4     Options.max_write_buffer_number_to_maintain: 0
+2026/08/04-23:04:03.073404 1af4     Options.max_write_buffer_size_to_maintain: 0
+2026/08/04-23:04:03.073408 1af4            Options.bottommost_compression_opts.window_bits: -14
+2026/08/04-23:04:03.073411 1af4                  Options.bottommost_compression_opts.level: 32767
+2026/08/04-23:04:03.073415 1af4               Options.bottommost_compression_opts.strategy: 0
+2026/08/04-23:04:03.073418 1af4         Options.bottommost_compression_opts.max_dict_bytes: 0
+2026/08/04-23:04:03.073423 1af4         Options.bottommost_compression_opts.zstd_max_train_bytes: 0
+2026/08/04-23:04:03.073427 1af4         Options.bottommost_compression_opts.parallel_threads: 1
+2026/08/04-23:04:03.073432 1af4                  Options.bottommost_compression_opts.enabled: false
+2026/08/04-23:04:03.073437 1af4         Options.bottommost_compression_opts.max_dict_buffer_bytes: 0
+2026/08/04-23:04:03.073442 1af4         Options.bottommost_compression_opts.use_zstd_dict_trainer: true
+2026/08/04-23:04:03.073446 1af4            Options.compression_opts.window_bits: -14
+2026/08/04-23:04:03.073450 1af4                  Options.compression_opts.level: 32767
+2026/08/04-23:04:03.073454 1af4               Options.compression_opts.strategy: 0
+2026/08/04-23:04:03.073457 1af4         Options.compression_opts.max_dict_bytes: 0
+2026/08/04-23:04:03.073461 1af4         Options.compression_opts.zstd_max_train_bytes: 0
+2026/08/04-23:04:03.073465 1af4         Options.compression_opts.use_zstd_dict_trainer: true
+2026/08/04-23:04:03.073469 1af4         Options.compression_opts.parallel_threads: 1
+2026/08/04-23:04:03.073473 1af4                  Options.compression_opts.enabled: false
+2026/08/04-23:04:03.073476 1af4         Options.compression_opts.max_dict_buffer_bytes: 0
+2026/08/04-23:04:03.073480 1af4      Options.level0_file_num_compaction_trigger: 4
+2026/08/04-23:04:03.073483 1af4          Options.level0_slowdown_writes_trigger: 20
+2026/08/04-23:04:03.073487 1af4              Options.level0_stop_writes_trigger: 36
+2026/08/04-23:04:03.073491 1af4                   Options.target_file_size_base: 67108864
+2026/08/04-23:04:03.073495 1af4             Options.target_file_size_multiplier: 1
+2026/08/04-23:04:03.073499 1af4                Options.max_bytes_for_level_base: 268435456
+2026/08/04-23:04:03.073502 1af4 Options.level_compaction_dynamic_level_bytes: 1
+2026/08/04-23:04:03.073506 1af4          Options.max_bytes_for_level_multiplier: 10.000000
+2026/08/04-23:04:03.073511 1af4 Options.max_bytes_for_level_multiplier_addtl[0]: 1
+2026/08/04-23:04:03.073515 1af4 Options.max_bytes_for_level_multiplier_addtl[1]: 1
+2026/08/04-23:04:03.073518 1af4 Options.max_bytes_for_level_multiplier_addtl[2]: 1
+2026/08/04-23:04:03.073522 1af4 Options.max_bytes_for_level_multiplier_addtl[3]: 1
+2026/08/04-23:04:03.073526 1af4 Options.max_bytes_for_level_multiplier_addtl[4]: 1
+2026/08/04-23:04:03.073530 1af4 Options.max_bytes_for_level_multiplier_addtl[5]: 1
+2026/08/04-23:04:03.073534 1af4 Options.max_bytes_for_level_multiplier_addtl[6]: 1
+2026/08/04-23:04:03.073537 1af4       Options.max_sequential_skip_in_iterations: 8
+2026/08/04-23:04:03.073542 1af4                    Options.max_compaction_bytes: 1677721600
+2026/08/04-23:04:03.073545 1af4                        Options.arena_block_size: 1048576
+2026/08/04-23:04:03.073549 1af4   Options.soft_pending_compaction_bytes_limit: 68719476736
+2026/08/04-23:04:03.073553 1af4   Options.hard_pending_compaction_bytes_limit: 274877906944
+2026/08/04-23:04:03.073556 1af4                Options.disable_auto_compactions: 0
+2026/08/04-23:04:03.073561 1af4                        Options.compaction_style: kCompactionStyleLevel
+2026/08/04-23:04:03.073565 1af4                          Options.compaction_pri: kMinOverlappingRatio
+2026/08/04-23:04:03.073571 1af4 Options.compaction_options_universal.size_ratio: 1
+2026/08/04-23:04:03.073575 1af4 Options.compaction_options_universal.min_merge_width: 2
+2026/08/04-23:04:03.073579 1af4 Options.compaction_options_universal.max_merge_width: 4294967295
+2026/08/04-23:04:03.073582 1af4 Options.compaction_options_universal.max_size_amplification_percent: 200
+2026/08/04-23:04:03.073586 1af4 Options.compaction_options_universal.compression_size_percent: -1
+2026/08/04-23:04:03.073590 1af4 Options.compaction_options_universal.stop_style: kCompactionStopStyleTotalSize
+2026/08/04-23:04:03.073593 1af4 Options.compaction_options_universal.max_read_amp: -1
+2026/08/04-23:04:03.073597 1af4 Options.compaction_options_fifo.max_table_files_size: 1073741824
+2026/08/04-23:04:03.073601 1af4 Options.compaction_options_fifo.allow_compaction: 0
+2026/08/04-23:04:03.073605 1af4                   Options.table_properties_collectors: 
+2026/08/04-23:04:03.073610 1af4                   Options.inplace_update_support: 0
+2026/08/04-23:04:03.073614 1af4                 Options.inplace_update_num_locks: 10000
+2026/08/04-23:04:03.073620 1af4               Options.memtable_prefix_bloom_size_ratio: 0.000000
+2026/08/04-23:04:03.073627 1af4               Options.memtable_whole_key_filtering: 0
+2026/08/04-23:04:03.073630 1af4   Options.memtable_huge_page_size: 0
+2026/08/04-23:04:03.073634 1af4                           Options.bloom_locality: 0
+2026/08/04-23:04:03.073638 1af4                    Options.max_successive_merges: 0
+2026/08/04-23:04:03.073642 1af4             Options.strict_max_successive_merges: 0
+2026/08/04-23:04:03.073645 1af4                Options.optimize_filters_for_hits: 0
+2026/08/04-23:04:03.073649 1af4                Options.paranoid_file_checks: 0
+2026/08/04-23:04:03.073653 1af4                Options.force_consistency_checks: 1
+2026/08/04-23:04:03.073657 1af4                Options.report_bg_io_stats: 0
+2026/08/04-23:04:03.073661 1af4                               Options.ttl: 2592000
+2026/08/04-23:04:03.073664 1af4          Options.periodic_compaction_seconds: 0
+2026/08/04-23:04:03.073668 1af4                        Options.default_temperature: kUnknown
+2026/08/04-23:04:03.073672 1af4  Options.preclude_last_level_data_seconds: 0
+2026/08/04-23:04:03.073676 1af4    Options.preserve_internal_time_seconds: 0
+2026/08/04-23:04:03.073680 1af4                       Options.enable_blob_files: false
+2026/08/04-23:04:03.073684 1af4                           Options.min_blob_size: 0
+2026/08/04-23:04:03.073688 1af4                          Options.blob_file_size: 268435456
+2026/08/04-23:04:03.073692 1af4                   Options.blob_compression_type: NoCompression
+2026/08/04-23:04:03.073696 1af4          Options.enable_blob_garbage_collection: false
+2026/08/04-23:04:03.073700 1af4      Options.blob_garbage_collection_age_cutoff: 0.250000
+2026/08/04-23:04:03.073714 1af4 Options.blob_garbage_collection_force_threshold: 1.000000
+2026/08/04-23:04:03.073718 1af4          Options.blob_compaction_readahead_size: 0
+2026/08/04-23:04:03.073722 1af4                Options.blob_file_starting_level: 0
+2026/08/04-23:04:03.073725 1af4         Options.experimental_mempurge_threshold: 0.000000
+2026/08/04-23:04:03.073729 1af4            Options.memtable_max_range_deletions: 0
+2026/08/04-23:04:03.073773 1af4               Options.comparator: leveldb.BytewiseComparator
+2026/08/04-23:04:03.073777 1af4           Options.merge_operator: None
+2026/08/04-23:04:03.073782 1af4        Options.compaction_filter: None
+2026/08/04-23:04:03.073786 1af4        Options.compaction_filter_factory: None
+2026/08/04-23:04:03.073789 1af4  Options.sst_partitioner_factory: None
+2026/08/04-23:04:03.073793 1af4         Options.memtable_factory: SkipListFactory
+2026/08/04-23:04:03.073796 1af4            Options.table_factory: BlockBasedTable
+2026/08/04-23:04:03.073849 1af4            table_factory options:   flush_block_policy_factory: FlushBlockBySizePolicyFactory (000001D4273C6B80)
+  cache_index_and_filter_blocks: 0
+  cache_index_and_filter_blocks_with_high_priority: 1
+  pin_l0_filter_and_index_blocks_in_cache: 0
+  pin_top_level_index_and_filter: 1
+  index_type: 0
+  data_block_index_type: 0
+  index_shortening: 1
+  data_block_hash_table_util_ratio: 0.750000
+  checksum: 4
+  no_block_cache: 0
+  block_cache: 000001D47D12A110
+  block_cache_name: LRUCache
+  block_cache_options:
+    capacity : 33554432
+    num_shard_bits : 6
+    strict_capacity_limit : 0
+    memory_allocator : None
+    high_pri_pool_ratio: 0.500
+    low_pri_pool_ratio: 0.000
+  persistent_cache: 0000000000000000
+  block_size: 4096
+  block_size_deviation: 10
+  block_restart_interval: 16
+  index_block_restart_interval: 1
+  metadata_block_size: 4096
+  partition_filters: 0
+  use_delta_encoding: 1
+  filter_policy: nullptr
+  whole_key_filtering: 1
+  verify_compression: 0
+  read_amp_bytes_per_bit: 0
+  format_version: 6
+  enable_index_compression: 1
+  block_align: 0
+  max_auto_readahead_size: 262144
+  prepopulate_block_cache: 0
+  initial_auto_readahead_size: 8192
+  num_file_reads_for_auto_readahead: 2
+2026/08/04-23:04:03.073862 1af4        Options.write_buffer_size: 10485760
+2026/08/04-23:04:03.073867 1af4  Options.max_write_buffer_number: 2
+2026/08/04-23:04:03.073875 1af4          Options.compression: LZ4
+2026/08/04-23:04:03.073882 1af4                  Options.bottommost_compression: Disabled
+2026/08/04-23:04:03.073886 1af4       Options.prefix_extractor: nullptr
+2026/08/04-23:04:03.073890 1af4   Options.memtable_insert_with_hint_prefix_extractor: nullptr
+2026/08/04-23:04:03.073894 1af4             Options.num_levels: 7
+2026/08/04-23:04:03.073899 1af4        Options.min_write_buffer_number_to_merge: 1
+2026/08/04-23:04:03.073903 1af4     Options.max_write_buffer_number_to_maintain: 0
+2026/08/04-23:04:03.073907 1af4     Options.max_write_buffer_size_to_maintain: 0
+2026/08/04-23:04:03.073912 1af4            Options.bottommost_compression_opts.window_bits: -14
+2026/08/04-23:04:03.073916 1af4                  Options.bottommost_compression_opts.level: 32767
+2026/08/04-23:04:03.073921 1af4               Options.bottommost_compression_opts.strategy: 0
+2026/08/04-23:04:03.073925 1af4         Options.bottommost_compression_opts.max_dict_bytes: 0
+2026/08/04-23:04:03.073929 1af4         Options.bottommost_compression_opts.zstd_max_train_bytes: 0
+2026/08/04-23:04:03.073934 1af4         Options.bottommost_compression_opts.parallel_threads: 1
+2026/08/04-23:04:03.073938 1af4                  Options.bottommost_compression_opts.enabled: false
+2026/08/04-23:04:03.073942 1af4         Options.bottommost_compression_opts.max_dict_buffer_bytes: 0
+2026/08/04-23:04:03.073946 1af4         Options.bottommost_compression_opts.use_zstd_dict_trainer: true
+2026/08/04-23:04:03.073951 1af4            Options.compression_opts.window_bits: -14
+2026/08/04-23:04:03.073955 1af4                  Options.compression_opts.level: 32767
+2026/08/04-23:04:03.073960 1af4               Options.compression_opts.strategy: 0
+2026/08/04-23:04:03.073963 1af4         Options.compression_opts.max_dict_bytes: 0
+2026/08/04-23:04:03.073968 1af4         Options.compression_opts.zstd_max_train_bytes: 0
+2026/08/04-23:04:03.073971 1af4         Options.compression_opts.use_zstd_dict_trainer: true
+2026/08/04-23:04:03.073975 1af4         Options.compression_opts.parallel_threads: 1
+2026/08/04-23:04:03.073979 1af4                  Options.compression_opts.enabled: false
+2026/08/04-23:04:03.073983 1af4         Options.compression_opts.max_dict_buffer_bytes: 0
+2026/08/04-23:04:03.073987 1af4      Options.level0_file_num_compaction_trigger: 4
+2026/08/04-23:04:03.073990 1af4          Options.level0_slowdown_writes_trigger: 20
+2026/08/04-23:04:03.073995 1af4              Options.level0_stop_writes_trigger: 36
+2026/08/04-23:04:03.073999 1af4                   Options.target_file_size_base: 67108864
+2026/08/04-23:04:03.074002 1af4             Options.target_file_size_multiplier: 1
+2026/08/04-23:04:03.074006 1af4                Options.max_bytes_for_level_base: 268435456
+2026/08/04-23:04:03.074010 1af4 Options.level_compaction_dynamic_level_bytes: 1
+2026/08/04-23:04:03.074014 1af4          Options.max_bytes_for_level_multiplier: 10.000000
+2026/08/04-23:04:03.074018 1af4 Options.max_bytes_for_level_multiplier_addtl[0]: 1
+2026/08/04-23:04:03.074022 1af4 Options.max_bytes_for_level_multiplier_addtl[1]: 1
+2026/08/04-23:04:03.074026 1af4 Options.max_bytes_for_level_multiplier_addtl[2]: 1
+2026/08/04-23:04:03.074030 1af4 Options.max_bytes_for_level_multiplier_addtl[3]: 1
+2026/08/04-23:04:03.074033 1af4 Options.max_bytes_for_level_multiplier_addtl[4]: 1
+2026/08/04-23:04:03.074037 1af4 Options.max_bytes_for_level_multiplier_addtl[5]: 1
+2026/08/04-23:04:03.074041 1af4 Options.max_bytes_for_level_multiplier_addtl[6]: 1
+2026/08/04-23:04:03.074045 1af4       Options.max_sequential_skip_in_iterations: 8
+2026/08/04-23:04:03.074049 1af4                    Options.max_compaction_bytes: 1677721600
+2026/08/04-23:04:03.074052 1af4                        Options.arena_block_size: 1048576
+2026/08/04-23:04:03.074056 1af4   Options.soft_pending_compaction_bytes_limit: 68719476736
+2026/08/04-23:04:03.074060 1af4   Options.hard_pending_compaction_bytes_limit: 274877906944
+2026/08/04-23:04:03.074064 1af4                Options.disable_auto_compactions: 0
+2026/08/04-23:04:03.074070 1af4                        Options.compaction_style: kCompactionStyleLevel
+2026/08/04-23:04:03.074074 1af4                          Options.compaction_pri: kMinOverlappingRatio
+2026/08/04-23:04:03.074080 1af4 Options.compaction_options_universal.size_ratio: 1
+2026/08/04-23:04:03.074084 1af4 Options.compaction_options_universal.min_merge_width: 2
+2026/08/04-23:04:03.074088 1af4 Options.compaction_options_universal.max_merge_width: 4294967295
+2026/08/04-23:04:03.074092 1af4 Options.compaction_options_universal.max_size_amplification_percent: 200
+2026/08/04-23:04:03.074096 1af4 Options.compaction_options_universal.compression_size_percent: -1
+2026/08/04-23:04:03.074100 1af4 Options.compaction_options_universal.stop_style: kCompactionStopStyleTotalSize
+2026/08/04-23:04:03.074104 1af4 Options.compaction_options_universal.max_read_amp: -1
+2026/08/04-23:04:03.074108 1af4 Options.compaction_options_fifo.max_table_files_size: 1073741824
+2026/08/04-23:04:03.074111 1af4 Options.compaction_options_fifo.allow_compaction: 0
+2026/08/04-23:04:03.074178 1af4                   Options.table_properties_collectors: 
+2026/08/04-23:04:03.074195 1af4                   Options.inplace_update_support: 0
+2026/08/04-23:04:03.074202 1af4                 Options.inplace_update_num_locks: 10000
+2026/08/04-23:04:03.074209 1af4               Options.memtable_prefix_bloom_size_ratio: 0.000000
+2026/08/04-23:04:03.074215 1af4               Options.memtable_whole_key_filtering: 0
+2026/08/04-23:04:03.074220 1af4   Options.memtable_huge_page_size: 0
+2026/08/04-23:04:03.074229 1af4                           Options.bloom_locality: 0
+2026/08/04-23:04:03.074234 1af4                    Options.max_successive_merges: 0
+2026/08/04-23:04:03.074242 1af4             Options.strict_max_successive_merges: 0
+2026/08/04-23:04:03.074247 1af4                Options.optimize_filters_for_hits: 0
+2026/08/04-23:04:03.074253 1af4                Options.paranoid_file_checks: 0
+2026/08/04-23:04:03.074260 1af4                Options.force_consistency_checks: 1
+2026/08/04-23:04:03.074265 1af4                Options.report_bg_io_stats: 0
+2026/08/04-23:04:03.074271 1af4                               Options.ttl: 2592000
+2026/08/04-23:04:03.074278 1af4          Options.periodic_compaction_seconds: 0
+2026/08/04-23:04:03.074285 1af4                        Options.default_temperature: kUnknown
+2026/08/04-23:04:03.074292 1af4  Options.preclude_last_level_data_seconds: 0
+2026/08/04-23:04:03.074297 1af4    Options.preserve_internal_time_seconds: 0
+2026/08/04-23:04:03.074303 1af4                       Options.enable_blob_files: false
+2026/08/04-23:04:03.074309 1af4                           Options.min_blob_size: 0
+2026/08/04-23:04:03.074315 1af4                          Options.blob_file_size: 268435456
+2026/08/04-23:04:03.074321 1af4                   Options.blob_compression_type: NoCompression
+2026/08/04-23:04:03.074326 1af4          Options.enable_blob_garbage_collection: false
+2026/08/04-23:04:03.074333 1af4      Options.blob_garbage_collection_age_cutoff: 0.250000
+2026/08/04-23:04:03.074340 1af4 Options.blob_garbage_collection_force_threshold: 1.000000
+2026/08/04-23:04:03.074345 1af4          Options.blob_compaction_readahead_size: 0
+2026/08/04-23:04:03.074351 1af4                Options.blob_file_starting_level: 0
+2026/08/04-23:04:03.074357 1af4         Options.experimental_mempurge_threshold: 0.000000
+2026/08/04-23:04:03.074362 1af4            Options.memtable_max_range_deletions: 0
+2026/08/04-23:04:03.159779 1af4 DB pointer 000001D45F5C50C0

@@ -1,0 +1,17 @@
+// IntelliJ / JetBrains + GitHub Copilot (Agent mode) Model Context Protocol config.
+// Paste via Settings -> GitHub Copilot -> Model Context Protocol (or edit
+// ~/.config/github-copilot/intellij/mcp.json). Uses the same schema as VS Code.
+{
+  "servers": {
+    "microservices-kb": {
+      "type": "stdio",
+      "command": "C:/path/to/mcp-microservices-kb/.venv/Scripts/mcp-kb-server.exe",
+      "env": {
+        "MCP_KB_REPOS_ROOT": "C:/path/to/mcp-microservices-kb/data/repos",
+        "QDRANT_URL": "http://localhost:6333",
+        "EMBEDDING_PROVIDER": "fastembed",
+        "POSTGRES_ENABLED": "false"
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+# ============================================================
+# Manifest of the 19 microservice repositories to ingest.
+# `mcp-kb-ingest --clone` reads this file to clone/pull each repo
+# into MCP_KB_REPOS_ROOT. Replace URLs with your real remotes.
+#
+# Authentication (private HTTPS remotes):
+#   Preferred: set GIT_USERNAME + GIT_TOKEN (PAT) in .env — they are injected
+#   automatically into every HTTPS clone/pull URL, so URLs stay token-free here.
+#   Alternative: embed tokens explicitly with ${GIT_USERNAME}/${GIT_TOKEN}, e.g.
+#     url: "https://${GIT_USERNAME}:${GIT_TOKEN}@git.internal.example.com/rx/x.git"
+#   SSH URLs (git@host:org/repo.git) are used as-is with your local SSH key.
+#
+# Per-repo `branch:` overrides the shared default (GIT_DEFAULT_BRANCH / main).
+# ============================================================
+defaults:
+  branch: development
+  # Optional shared credentials helper name (uses local git config if empty).
+  remote_prefix: "https://github.com/
+
+repositories:
+  - name: test
+    url: "${remote_prefix}/test.git"

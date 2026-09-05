@@ -1,0 +1,37 @@
+# ============================================================
+# Example RBAC policy — only enforced when RBAC_ENABLED=true.
+# Copy/edit this file (path configurable via RBAC_POLICY_PATH) to define
+# who can call which tools against which repositories.
+#
+# When RBAC_ENABLED=false (the default) this file is never read and every
+# tool call is allowed, preserving today's single-developer, local-first
+# behaviour.
+# ============================================================
+
+default_role: viewer
+
+roles:
+  # Read-only knowledge access; cannot persist incidents or run exception RCA.
+  viewer:
+    tools: ["*"]
+    deny_tools: ["analyse_exception", "classify_incident"]
+    repos: ["*"]
+
+  # Full access, including RCA tools that write incident records.
+  engineer:
+    tools: ["*"]
+    repos: ["*"]
+
+  # Full access, scoped to a subset of repositories (e.g. a team boundary).
+  team-order:
+    tools: ["*"]
+    repos: ["rx-order", "rx-inventory", "rx-pricing"]
+
+  admin:
+    tools: ["*"]
+    repos: ["*"]
+
+# Maps a resolved principal (see MCP_KB_PRINCIPAL, or your HTTP auth
+# middleware in a multi-tenant deployment) to one of the roles above.
+principals:
+  local: admin

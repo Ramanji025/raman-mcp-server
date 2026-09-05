@@ -1,0 +1,123 @@
+# ============================================================
+# Static tuning for the ingestion + retrieval engine.
+# Values here are overridden by environment variables where noted.
+# ============================================================
+
+ingestion:
+  # File globs collected per repository, grouped by knowledge domain.
+  include:
+    java:        ["**/*.java"]
+    maven:       ["**/pom.xml"]
+    gradle:      ["**/build.gradle", "**/settings.gradle"]
+    spring_yaml: ["**/application*.yml", "**/application*.yaml", "**/bootstrap*.yml", "**/bootstrap*.yaml"]
+    liquibase:   ["**/db/changelog/*.xml", "**/db/changelog/**/*.xml", "**/db/changelog/*.yaml", "**/db/changelog/**/*.yaml", "**/changelog*.xml", "**/changelog*.yaml"]
+    flyway:      ["**/db/migration/**/*.sql"]
+    openapi:     ["**/openapi*.yml", "**/openapi*.yaml", "**/openapi*.json", "**/api-docs*.json"]
+    # Incidents are matched before the generic docs glob so post-mortems in an
+    # incidents/ folder are not swallowed by **/*.md.
+    incidents:   ["**/incidents/*.md", "**/incidents/**/*.md", "**/postmortems/*.md", "**/postmortems/**/*.md", "**/docs/incidents/*.md"]
+    docs:        ["**/*.md", "**/*.adoc"]
+  exclude:
+    - "**/target/**"
+    - "**/build/**"
+    - "**/node_modules/**"
+    - "**/.git/**"
+    - "**/generated/**"
+    - "**/test-output/**"
+
+  # Chunking strategy.
+  code_chunk_lines: 120
+  code_chunk_overlap_lines: 20
+  doc_chunk_tokens: 512
+  doc_chunk_overlap_tokens: 64
+  max_file_size_kb: 1024
+
+vector:
+  # One logical collection per content type keeps retrieval sharply scoped.
+  collections:
+    - code
+    - docs
+    - architecture
+    - defects
+    - incidents
+  distance: Cosine
+  # HNSW: lower ef_search for fast retrieval on a small index; raise toward 256 for large multi-service indexes.
+  hnsw:
+    m: 32
+    ef_construct: 256
+    ef_search: 64
+
+retrieval:
+  # Hybrid RAG + KG fusion (dense + BM25 sparse + graph-name boost).
+  vector_top_k: 20
+  # P2.2: raise hops to 2 so cross-service Feign/Kafka chains are reachable
+  graph_expansion_hops: 2
+  rerank_top_k: 8
+  # Reciprocal-rank-fusion constant.
+  rrf_k: 60
+
+graph:
+  # Node + edge types materialised in the knowledge graph. This list is
+  # documentation only (not read/enforced by code) — the authoritative,
+  # enforced schema lives in models.py (NodeType / EdgeType enums).
+  node_types:
+    - Service
+    - Controller
+    - Endpoint
+    - DTO
+    - Entity
+    - Repository
+    - Table
+    - KafkaProducer
+    - KafkaConsumer
+    - Topic
+    - Config
+    - Incident
+    - ServiceLayer
+    - Method
+    - DesignPattern
+    - Dependency
+    - SchemaColumn
+    - ExceptionType
+    - TestClass
+    - ConfigProperty
+    - Migration
+    # Enterprise graph schema additions (see docs/ENTERPRISE_ARCHITECTURE.md):
+    - GitRepository
+    - Module
+    - Package
+    - Interface
+    - Class
+    - Exception
+  edge_types:
+    - EXPOSES          # Controller -> Endpoint
+    - DECLARED_IN      # Endpoint -> Service
+    - RETURNS          # Endpoint -> DTO
+    - ACCEPTS          # Endpoint -> DTO
+    - MAPS_TO          # Entity -> Table
+    - QUERIES          # Repository -> Entity
+    - PRODUCES_TO      # KafkaProducer -> Topic
+    - CONSUMES_FROM    # KafkaConsumer -> Topic
+    - CALLS            # Service -> Service (feign/rest); Method -> Method
+    - RESOLVES_TO      # FeignClient method -> specific Endpoint on target service (P3.2)
+    - DEPENDS_ON       # Service -> Service (maven/config)
+    - AFFECTS          # Incident -> {Service,Endpoint,Table}
+    - DELEGATES_TO     # Controller -> Service, Service -> Repository
+    - THROWS           # Method -> ExceptionType
+    - USES_CONFIG      # Class -> ConfigProperty
+    - IMPLEMENTED_BY   # Interface -> implementing class
+    - USES_PATTERN     # Class -> DesignPattern
+    - HAS_COLUMN       # Entity -> SchemaColumn
+    - HAS_RELATIONSHIP # Entity -> Entity (JPA)
+    - TESTED_BY        # Class -> TestClass
+    - EXTENDS          # Exception hierarchy / class inheritance
+    - HAS_MIGRATION    # Table -> Migration
+    - USES_DEPENDENCY  # Service -> Dependency
+    # Enterprise graph schema additions (see docs/ENTERPRISE_ARCHITECTURE.md):
+    - IMPLEMENTS       # Class -> Interface
+    - CATCHES          # Method -> ExceptionType it catches
+    - USES             # generic Class/Method -> Dependency usage
+    - READS            # Method/Repository -> Table (read access)
+    - WRITES           # Method/Repository -> Table (write access)
+    - PUBLISHES        # Producer -> Topic (spec-exact alias of PRODUCES_TO)
+    - CONSUMES         # Consumer -> Topic (spec-exact alias of CONSUMES_FROM)
