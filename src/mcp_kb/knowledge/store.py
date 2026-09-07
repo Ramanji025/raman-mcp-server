@@ -2,10 +2,17 @@
 from __future__ import annotations
 
 import json
+import logging
 from pathlib import Path
+
+from pydantic import ValidationError
 
 from ..config import Settings
 from .models import KnowledgeObject
+
+logger = logging.getLogger(__name__)
+
+_CONFLICT_MARKERS = ("<<<<<<<", "=======", ">>>>>>>")
 
 
 class KnowledgeStore:
@@ -42,11 +49,20 @@ class KnowledgeStore:
             return []
         items: list[KnowledgeObject] = []
         with self._path.open("r", encoding="utf-8") as fh:
-            for line in fh:
+            for lineno, line in enumerate(fh, start=1):
                 line = line.strip()
-                if not line:
+                if not line or line.startswith(_CONFLICT_MARKERS):
+                    if line.startswith(_CONFLICT_MARKERS):
+                        logger.warning(
+                            "Skipping git conflict marker at %s:%d", self._path, lineno
+                        )
                     continue
-                items.append(KnowledgeObject.model_validate_json(line))
+                try:
+                    items.append(KnowledgeObject.model_validate_json(line))
+                except ValidationError:
+                    logger.warning(
+                        "Skipping invalid knowledge object at %s:%d", self._path, lineno
+                    )
         return items
 
     def _write_all(self, items: list[KnowledgeObject]) -> None:
