@@ -12,6 +12,7 @@ from pathlib import Path
 from lxml import etree
 
 from ...models import DependencyArtifact
+from ...security.safe_xml import safe_parse
 from . import feature_catalog as fc
 
 _MVN_NS = {"m": "http://maven.apache.org/POM/4.0.0"}
@@ -45,7 +46,7 @@ def scan(repos_root: Path) -> list[DependencyArtifact]:
     for pom_path in sorted(repos_root.rglob("pom.xml")):
         service = pom_path.parent.name
         try:
-            root = etree.parse(pom_path).getroot()
+            root = safe_parse(pom_path).getroot()
         except etree.XMLSyntaxError:
             continue
 

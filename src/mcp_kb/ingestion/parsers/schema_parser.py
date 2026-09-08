@@ -11,6 +11,7 @@ from ...models import (
     ParseResult,
     SourceFile,
 )
+from ...security.safe_xml import safe_parse
 from .base import Parser, make_node_id
 
 
@@ -51,7 +52,7 @@ class LiquibaseParser(Parser):
     def _from_xml(path: str) -> set[str]:
         tables: set[str] = set()
         try:
-            tree = etree.parse(path)
+            tree = safe_parse(path)
         except etree.XMLSyntaxError:
             return tables
         for el in tree.iter():

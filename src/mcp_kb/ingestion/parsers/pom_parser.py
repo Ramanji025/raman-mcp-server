@@ -11,6 +11,7 @@ from ...models import (
     ParseResult,
     SourceFile,
 )
+from ...security.safe_xml import safe_parse
 from .base import Parser, make_node_id
 
 _MVN_NS = {"m": "http://maven.apache.org/POM/4.0.0"}
@@ -38,7 +39,7 @@ class PomParser(Parser):
         result = ParseResult()
         service = self._service_name(source)
         try:
-            tree = etree.parse(source.abs_path)
+            tree = safe_parse(source.abs_path)
         except etree.XMLSyntaxError:
             return result
         root = tree.getroot()

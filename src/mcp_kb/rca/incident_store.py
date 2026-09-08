@@ -347,8 +347,12 @@ class _PostgresBackend(_Backend):
             params.append(status)
         where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
         with self._conn.cursor() as cur:
+            # `clauses` only ever contains the fixed literal strings above
+            # ("service_name = %s", etc.) — never user input — and all actual
+            # values are passed through the parameterized %s placeholders in
+            # `params`/`limit`, so this is not an injection vector.
             cur.execute(
-                f"SELECT * FROM incidents {where} ORDER BY created_at DESC LIMIT %s",
+                f"SELECT * FROM incidents {where} ORDER BY created_at DESC LIMIT %s",  # nosec B608
                 (*params, limit),
             )
             cols = [d.name for d in cur.description]

@@ -49,6 +49,21 @@ class ContentType(str, Enum):
     OPENAPI = "openapi"
     DOCS = "docs"
     INCIDENTS = "incidents"
+    # --- Phase 2: infra-as-code (Dockerfile / Kubernetes / Kustomize) ---
+    INFRA = "infra"
+    # --- Phase 4: generic multi-language extraction engine ---
+    PYTHON = "python"
+    GO = "go"
+    TYPESCRIPT = "typescript"
+    TSX = "tsx"
+    JAVASCRIPT = "javascript"
+    CSHARP = "csharp"
+    RUST = "rust"
+    RUBY = "ruby"
+    PHP = "php"
+    C = "c"
+    CPP = "cpp"
+    BASH = "bash"
 
 
 class SourceFile(BaseModel):
@@ -129,6 +144,11 @@ class NodeType(str, Enum):
     # --- Dependency Intelligence additions ---
     DEP_ARTIFACT = "DepArtifact"     # canonical package (maven/nuget/pip)
     DEP_FEATURE = "DepFeature"       # capability/feature cluster (e.g. "Web MVC")
+    # --- Follow-on gap 7: deeper Spring Boot domain modeling ---
+    BEAN_DEFINITION = "BeanDefinition"  # a @Bean-annotated factory method's produced bean
+    # --- Phase 2 additions ---
+    FILE = "File"                    # a source file (git co-change coupling endpoint)
+    INFRA_RESOURCE = "InfraResource"  # Dockerfile/K8s/Kustomize resource declared in a repo
 
 
 class EdgeType(str, Enum):
@@ -178,6 +198,17 @@ class EdgeType(str, Enum):
     TRANSITIVE_DEP = "TRANSITIVE_DEP"            # DEP_ARTIFACT → DEP_ARTIFACT
     # P3.2: Feign client method → the specific endpoint it invokes on the target service
     RESOLVES_TO = "RESOLVES_TO"
+    # --- Phase 2: graph model enrichment (additive, non-breaking) ---
+    SIMILAR_TO = "SIMILAR_TO"            # method↔method near-duplicate (MinHash/LSH Jaccard)
+    SEMANTICALLY_RELATED = "SEMANTICALLY_RELATED"  # vocabulary-mismatch bridge (embedding cosine)
+    DATA_FLOWS = "DATA_FLOWS"            # caller arg → callee parameter dataflow
+    FILE_CHANGES_WITH = "FILE_CHANGES_WITH"  # git co-change coupling between two files
+    EMITS = "EMITS"                      # producer → event/queue (generic pub-sub, non-Kafka)
+    LISTENS_ON = "LISTENS_ON"            # consumer → event/queue (generic pub-sub, non-Kafka)
+    GRPC_CALLS = "GRPC_CALLS"            # gRPC client stub → gRPC service method
+    GRAPHQL_RESOLVES = "GRAPHQL_RESOLVES"  # @QueryMapping/@MutationMapping method → GraphQL field
+    # --- Follow-on: runtime trace overlay (opt-in, never mutates static CALLS) ---
+    RUNTIME_CALL = "RUNTIME_CALL"  # observed production call, from ingest_traces
 
 
 class GraphNode(BaseModel):

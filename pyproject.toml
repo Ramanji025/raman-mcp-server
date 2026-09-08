@@ -21,9 +21,14 @@ dependencies = [
     "fastembed>=0.3.6",
     "tree-sitter>=0.23.0",
     "tree-sitter-java>=0.23.0",
+    # Phase 4: generic multi-language extraction engine — prebuilt grammars for
+    # Python/Go/TypeScript/JavaScript/C#/etc (single package, no per-language pins).
+    "tree-sitter-language-pack>=1.16.0",
     "GitPython>=3.1.43",
     "PyYAML>=6.0.2",
     "lxml>=5.3.0",
+    # Phase 6: XXE-hardened XML parsing for untrusted repo manifests (tech_detector.py).
+    "defusedxml>=0.7.1",
     "psycopg[binary]>=3.2.0",
     "SQLAlchemy>=2.0.35",
     "pydantic>=2.9.0",
@@ -76,6 +81,12 @@ nlp = [
 enterprise = [
     "mcp-microservices-kb[neo4j,otel,langfuse]",
 ]
+# Phase 6: security tooling (SAST + fuzz/property testing) — dev-only, not
+# needed at runtime. `pip install -e ".[security]"` to run scripts/security_audit.py.
+security = [
+    "bandit>=1.9.0",
+    "hypothesis>=6.100.0",
+]
 
 [project.scripts]
 mcp-kb-server = "mcp_kb.server:main"
@@ -85,6 +96,9 @@ mcp-kb-rewrite = "mcp_kb.ingestion.full_rewrite:cli_rewrite"
 mcp-kb-enrich = "mcp_kb.ingestion.llm_enrichment:cli_main"
 mcp-kb-build-all = "mcp_kb.ingestion.build_all:cli_build_all"
 mcp-kb-eval = "mcp_kb.eval.cli:main"
+mcp-kb-eval-perf = "mcp_kb.eval.cli_perf:main"
+mcp-kb-ui = "mcp_kb.ui.graph_viewer:main"
+mcp-kb-install-agents = "mcp_kb.discover.agent_config:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

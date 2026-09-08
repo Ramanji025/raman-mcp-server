@@ -24,6 +24,7 @@ from pathlib import Path
 from lxml import etree
 
 from ...models import DependencyArtifact
+from ...security.safe_xml import safe_parse
 
 _MVN_NS = {"m": "http://maven.apache.org/POM/4.0.0"}
 _INTERNAL_GROUPS = ("com.bh", "com.waygate", "com.bhge", "com.baker-hughes")
@@ -52,7 +53,7 @@ def resolve(
     artifact_own_deps: dict[str, set[str]] = defaultdict(set)
     for pom_path in repos_root.rglob("pom.xml"):
         try:
-            root = etree.parse(pom_path).getroot()
+            root = safe_parse(pom_path).getroot()
         except etree.XMLSyntaxError:
             continue
 

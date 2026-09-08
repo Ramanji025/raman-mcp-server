@@ -12,12 +12,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 COPY requirements.txt pyproject.toml ./
-RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN pip install --upgrade pip --trusted-host pypi.org --trusted-host files.pythonhosted.org
+
+RUN pip install \
+    --trusted-host pypi.org \
+    --trusted-host files.pythonhosted.org \
+    -r requirements.txt
 
 COPY src ./src
 COPY config ./config
 COPY scripts ./scripts
-RUN pip install -e ".[neo4j]"
+RUN pip install \
+    --trusted-host pypi.org \
+    --trusted-host files.pythonhosted.org \
+    setuptools wheel build
 
 # Pre-warm the local embedding model so first request is fast.
 RUN python -c "from fastembed import TextEmbedding; TextEmbedding('BAAI/bge-small-en-v1.5')" || true

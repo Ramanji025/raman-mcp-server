@@ -34,8 +34,10 @@ log = get_logger(__name__)
 def _rmtree_force(path: Path) -> None:
     """Remove a directory tree, handling Windows read-only and locked .git files."""
     if sys.platform == "win32":
-        # 'rd /s /q' releases Git pack-file locks that shutil.rmtree cannot clear
-        subprocess.run(["cmd", "/c", "rd", "/s", "/q", str(path)], check=True)
+        # 'rd /s /q' releases Git pack-file locks that shutil.rmtree cannot clear.
+        # Safe: fixed argv list (no shell=True), `path` is a local repo directory
+        # under our own MCP_KB_REPOS_ROOT, never externally-supplied shell text.
+        subprocess.run(["cmd", "/c", "rd", "/s", "/q", str(path)], check=True)  # nosec B603 B607
     else:
         def _clear_readonly(func, p, _):
             Path(p).chmod(stat.S_IWRITE)

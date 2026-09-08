@@ -44,11 +44,16 @@ class RallyClient:
 
     def __init__(self, api_key: str, base_url: str = _DEFAULT_BASE,
                  workspace_ref: str | None = None,
-                 project_ref: str | None = None) -> None:
+                 project_ref: str | None = None,
+                 verify_ssl: bool = True) -> None:
         self.api_key = api_key
         self.base_url = base_url.rstrip("/")
         self.workspace_ref = workspace_ref
         self.project_ref = project_ref
+        # Secure by default. Only disable for a trusted internal Rally instance
+        # with a self-signed cert you cannot add to the CA bundle — never for
+        # the public rallydev.com endpoint.
+        self.verify_ssl = verify_ssl
 
     # ------------------------------------------------------------------ #
     # Public API
@@ -143,15 +148,16 @@ class RallyClient:
         headers = {"ZSESSIONID": self.api_key, "Accept": "application/json"}
 
         if _HTTPX_AVAILABLE:
-            with httpx.Client(verify=False, timeout=30) as client:
+            with httpx.Client(verify=self.verify_ssl, timeout=30) as client:
                 resp = client.get(full_url, headers=headers)
                 resp.raise_for_status()
                 return resp.json()
 
         # Fallback to stdlib urllib.
         ctx = _ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = _ssl.CERT_NONE
+        if not self.verify_ssl:
+            ctx.check_hostname = False
+            ctx.verify_mode = _ssl.CERT_NONE
         req = urllib.request.Request(full_url, headers=headers)
         with urllib.request.urlopen(req, context=ctx, timeout=30) as r:
             return _json.loads(r.read().decode("utf-8"))
@@ -174,4 +180,5 @@ def make_rally_client_from_settings(settings) -> RallyClient | None:
         base_url=getattr(settings, "rally_base_url", _DEFAULT_BASE),
         workspace_ref=getattr(settings, "rally_workspace_ref", None),
         project_ref=getattr(settings, "rally_project_ref", None),
+        verify_ssl=getattr(settings, "rally_verify_ssl", True),
     )

@@ -7,6 +7,7 @@ from pathlib import Path
 from lxml import etree
 
 from ...models import DependencyArtifact
+from ...security.safe_xml import safe_parse
 from . import feature_catalog as fc
 
 
@@ -22,7 +23,7 @@ def scan(repos_root: Path) -> list[DependencyArtifact]:
     for csproj in sorted(repos_root.rglob("*.csproj")):
         service = csproj.parents[1].name  # …/repos/<service>/…/proj.csproj
         try:
-            root = etree.parse(csproj).getroot()
+            root = safe_parse(csproj).getroot()
         except etree.XMLSyntaxError:
             continue
 

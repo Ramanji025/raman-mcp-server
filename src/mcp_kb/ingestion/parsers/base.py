@@ -21,7 +21,9 @@ def make_node_id(node_type: str, service: str, name: str) -> str:
 def make_chunk_id(repo: str, rel_path: str, ordinal: int, salt: str = "") -> str:
     """Build a stable, deterministic chunk id from repo/path/ordinal/salt."""
     raw = f"{repo}::{rel_path}::{ordinal}::{salt}"
-    return hashlib.sha1(raw.encode("utf-8")).hexdigest()
+    # usedforsecurity=False: this hash is a deterministic id, never a security
+    # control (no secrets/auth), so SHA1's cryptographic weakness is moot here.
+    return hashlib.sha1(raw.encode("utf-8"), usedforsecurity=False).hexdigest()
 
 
 class Parser(ABC):

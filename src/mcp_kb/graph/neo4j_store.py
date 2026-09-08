@@ -450,6 +450,24 @@ class Neo4jGraphStore(GraphTraversalMixin):
         return {"nodes": nodes, "edges": edges, "services": len(self.services()),
                 "by_type": by_type, "backend": "neo4j"}
 
+    # ---- Phase 1: ad-hoc read-only Cypher passthrough (query_graph tool) ---- #
+    _WRITE_CLAUSES = (
+        "CREATE", "MERGE", "DELETE", "DETACH DELETE", "SET ", "REMOVE",
+        "DROP", "CALL DB.", "CALL APOC.CREATE", "CALL APOC.MERGE", "LOAD CSV",
+    )
+
+    def run_cypher(self, query: str, params: dict | None = None,
+                    max_rows: int = 200) -> list[dict]:
+        """Execute a read-only Cypher query; raises ValueError if it looks like a write."""
+        upper = query.upper()
+        for clause in self._WRITE_CLAUSES:
+            if clause in upper:
+                raise ValueError(f"query_graph is read-only; '{clause.strip()}' is not allowed")
+        capped = f"{query.rstrip().rstrip(';')} LIMIT {int(max_rows)}" if "LIMIT" not in upper else query
+        with self._driver.session(database=self._database) as session:
+            result = session.run(capped, **(params or {}))
+            return [dict(record) for record in result]
+
     # ---- persistence: Neo4j persists automatically, these are no-ops ---- #
     def save(self) -> None:
         """No-op: Neo4j persists every write immediately."""

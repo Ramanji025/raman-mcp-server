@@ -1,0 +1,51 @@
+name: security
+
+# Phase 6: security hardening gate. Runs bandit (SAST) and fails the build on
+# any HIGH-severity finding (see scripts/security_audit.py), plus the
+# adversarial/fuzz test suite (path traversal, Cypher write-injection).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  sast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project + security tooling
+        run: pip install -e ".[security]"
+
+      - name: Bandit SAST gate (fails on HIGH severity)
+        run: python scripts/security_audit.py
+
+      - name: Upload bandit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-report
+          path: data/security/bandit_report.json
+
+  adversarial-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project + test tooling
+        run: |
+          pip install -e ".[security]"
+          pip install pytest
+
+      - name: Run adversarial/fuzz test suite
+        run: pytest tests/unit/test_security_adversarial.py -v

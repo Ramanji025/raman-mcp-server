@@ -12,7 +12,8 @@ from ..models import Chunk, ContentType, EdgeType, NodeType, ParseResult
 
 def _fingerprint(payload: dict[str, Any]) -> str:
     raw = json.dumps(payload, sort_keys=True, default=str)
-    return hashlib.sha1(raw.encode("utf-8")).hexdigest()
+    # usedforsecurity=False: cache-key fingerprint only, never a security control.
+    return hashlib.sha1(raw.encode("utf-8"), usedforsecurity=False).hexdigest()
 
 
 class SemanticSummaryCache:

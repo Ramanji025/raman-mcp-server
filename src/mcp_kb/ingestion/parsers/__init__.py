@@ -5,7 +5,10 @@ from typing import TYPE_CHECKING
 
 from ...config import Settings
 from ...models import ContentType, ParseResult, SourceFile
+from ..langspec import LANGUAGE_SPECS
 from .base import Parser
+from .generic_extractor import GenericTreeSitterParser
+from .infra_parser import InfraParser
 from .java_parser import JavaParser
 from .markdown_parser import MarkdownParser
 from .openapi_parser import OpenApiParser
@@ -36,6 +39,22 @@ class ParserRegistry:
             ContentType.OPENAPI: OpenApiParser(settings),
             ContentType.DOCS: MarkdownParser(settings, ContentType.DOCS),
             ContentType.INCIDENTS: MarkdownParser(settings, ContentType.INCIDENTS),
+            ContentType.INFRA: InfraParser(settings),
+            # Phase 4: generic multi-language engine — one GenericTreeSitterParser
+            # instance per LangSpec, dispatched by ContentType exactly like every
+            # other parser here (see ingestion/langspec.py for the spec table).
+            ContentType.PYTHON: GenericTreeSitterParser(settings, LANGUAGE_SPECS["python"]),
+            ContentType.GO: GenericTreeSitterParser(settings, LANGUAGE_SPECS["go"]),
+            ContentType.TYPESCRIPT: GenericTreeSitterParser(settings, LANGUAGE_SPECS["typescript"]),
+            ContentType.TSX: GenericTreeSitterParser(settings, LANGUAGE_SPECS["tsx"]),
+            ContentType.JAVASCRIPT: GenericTreeSitterParser(settings, LANGUAGE_SPECS["javascript"]),
+            ContentType.CSHARP: GenericTreeSitterParser(settings, LANGUAGE_SPECS["csharp"]),
+            ContentType.RUST: GenericTreeSitterParser(settings, LANGUAGE_SPECS["rust"]),
+            ContentType.RUBY: GenericTreeSitterParser(settings, LANGUAGE_SPECS["ruby"]),
+            ContentType.PHP: GenericTreeSitterParser(settings, LANGUAGE_SPECS["php"]),
+            ContentType.C: GenericTreeSitterParser(settings, LANGUAGE_SPECS["c"]),
+            ContentType.CPP: GenericTreeSitterParser(settings, LANGUAGE_SPECS["cpp"]),
+            ContentType.BASH: GenericTreeSitterParser(settings, LANGUAGE_SPECS["bash"]),
         }
 
     def set_project_model(self, model: ProjectKnowledgeModel | None) -> None:

@@ -46,12 +46,37 @@ class RepoScanner:
             return True
         return False
 
+    # ---- Phase 1: .mcpkbignore (gitignore-style per-repo exclude file) ---- #
+    def _load_mcpkbignore(self, repo_dir: Path) -> list[str]:
+        """Parse `<repo_dir>/.mcpkbignore` into raw patterns (empty if file absent)."""
+        path = repo_dir / ".mcpkbignore"
+        if not path.exists():
+            return []
+        return [
+            line.strip() for line in path.read_text(encoding="utf-8", errors="ignore").splitlines()
+            if line.strip() and not line.strip().startswith("#")
+        ]
+
+    def _is_mcpkbignored(self, posix: str, patterns: list[str]) -> bool:
+        """gitignore-style match: last matching pattern wins; `!pattern` negates."""
+        ignored = False
+        for pattern in patterns:
+            negate = pattern.startswith("!")
+            pat = (pattern[1:] if negate else pattern).strip("/")
+            if self._matches(posix, pat) or self._matches(posix, f"{pat}/*") or \
+               self._matches(posix, f"**/{pat}") or self._matches(posix, f"**/{pat}/*"):
+                ignored = not negate
+        return ignored
+
     def scan(self, repo_name: str, repo_dir: Path) -> Iterator[SourceFile]:
         """Yield every ingestible file in ``repo_dir``."""
+        ignore_patterns = self._load_mcpkbignore(repo_dir)
         for path in repo_dir.rglob("*"):
             if not path.is_file():
                 continue
             rel = path.relative_to(repo_dir).as_posix()
+            if ignore_patterns and self._is_mcpkbignored(rel, ignore_patterns):
+                continue
             ctype = self.classify(rel)
             if ctype is None:
                 continue
@@ -75,9 +100,12 @@ class RepoScanner:
         self, repo_name: str, repo_dir: Path, rel_paths: list[str]
     ) -> Iterator[SourceFile]:
         """Classify + hash a specific set of paths (incremental indexing)."""
+        ignore_patterns = self._load_mcpkbignore(repo_dir)
         for rel in rel_paths:
             path = repo_dir / rel
             if not path.is_file():
+                continue
+            if ignore_patterns and self._is_mcpkbignored(rel.replace("\\", "/"), ignore_patterns):
                 continue
             ctype = self.classify(rel)
             if ctype is None:

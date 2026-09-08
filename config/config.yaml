@@ -17,6 +17,21 @@ ingestion:
     # incidents/ folder are not swallowed by **/*.md.
     incidents:   ["**/incidents/*.md", "**/incidents/**/*.md", "**/postmortems/*.md", "**/postmortems/**/*.md", "**/docs/incidents/*.md"]
     docs:        ["**/*.md", "**/*.adoc"]
+    # Phase 2: infra-as-code as first-class graph nodes (Dockerfile/K8s/Kustomize).
+    infra:       ["**/Dockerfile", "**/Dockerfile.*", "**/k8s/*.yml", "**/k8s/*.yaml", "**/k8s/**/*.yml", "**/k8s/**/*.yaml", "**/kustomization.yml", "**/kustomization.yaml"]
+    # Phase 4: generic multi-language extraction engine (see ingestion/langspec.py).
+    python:      ["**/*.py"]
+    go:          ["**/*.go"]
+    typescript:  ["**/*.ts"]
+    tsx:         ["**/*.tsx"]
+    javascript:  ["**/*.js", "**/*.jsx", "**/*.mjs", "**/*.cjs"]
+    csharp:      ["**/*.cs"]
+    rust:        ["**/*.rs"]
+    ruby:        ["**/*.rb"]
+    php:         ["**/*.php"]
+    c:           ["**/*.c", "**/*.h"]
+    cpp:         ["**/*.cpp", "**/*.cc", "**/*.cxx", "**/*.hpp", "**/*.hh"]
+    bash:        ["**/*.sh", "**/*.bash"]
   exclude:
     - "**/target/**"
     - "**/build/**"
@@ -24,6 +39,19 @@ ingestion:
     - "**/.git/**"
     - "**/generated/**"
     - "**/test-output/**"
+    # Phase 4: per-ecosystem noise/vendor/build-output directories.
+    - "**/dist/**"
+    - "**/.venv/**"
+    - "**/venv/**"
+    - "**/__pycache__/**"
+    - "**/*.egg-info/**"
+    - "**/vendor/**"
+    - "**/bin/**"
+    - "**/obj/**"
+    - "**/.next/**"
+    - "**/coverage/**"
+    - "**/*.min.js"
+    - "**/*.d.ts"
 
   # Chunking strategy.
   code_chunk_lines: 120

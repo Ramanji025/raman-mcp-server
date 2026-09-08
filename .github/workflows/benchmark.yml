@@ -1,0 +1,45 @@
+name: benchmark
+
+# Phase 5: performance regression gate. Mirrors codebase-memory-mcp's release
+# policy (MAINTAINERS.md): >15% unexplained parse-throughput regression vs.
+# the last recorded run fails the build. The parse-throughput benchmark is
+# infra-independent (no Neo4j/Qdrant needed), so it runs on every push/PR.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  perf-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project
+        run: pip install -e .
+
+      - name: Restore benchmark history
+        uses: actions/cache@v4
+        with:
+          path: data/eval/performance_history.jsonl
+          # Keyed on branch, not commit, so each run compares against the
+          # previous run on the same branch (restore-keys falls back to main).
+          key: perf-history-${{ github.ref_name }}
+          restore-keys: |
+            perf-history-main
+
+      - name: Run performance benchmark (parse throughput, gated)
+        run: python -m mcp_kb.eval.cli_perf
+
+      - name: Upload benchmark history
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-history
+          path: data/eval/performance_history.jsonl

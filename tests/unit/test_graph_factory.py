@@ -4,17 +4,19 @@ from __future__ import annotations
 import pytest
 
 from mcp_kb.graph.factory import get_graph_store
+from mcp_kb.graph.knowledge_graph import KnowledgeGraph
 
 
-def test_networkx_runtime_backend_is_rejected(settings):
+def test_networkx_is_a_supported_zero_infrastructure_backend(settings):
+    """Phase 7: NetworkX is an officially-supported local mode, not rejected."""
     settings.graph_backend = "networkx"
-    with pytest.raises(ValueError, match="Neo4j is required"):
-        get_graph_store(settings)
+    store = get_graph_store(settings)
+    assert isinstance(store, KnowledgeGraph)
 
 
 def test_unknown_runtime_backend_is_rejected(settings):
     settings.graph_backend = "not-a-real-backend"
-    with pytest.raises(ValueError, match="Neo4j is required"):
+    with pytest.raises(ValueError, match="Unsupported GRAPH_BACKEND"):
         get_graph_store(settings)
 
 

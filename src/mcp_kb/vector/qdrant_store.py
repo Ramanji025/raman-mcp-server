@@ -29,7 +29,13 @@ class QdrantStore:
         self.client = QdrantClient(
             url=settings.qdrant_url,
             api_key=settings.qdrant_api_key or None,
-            prefer_grpc=False,
+            # Follow-on gap 1 perf: gRPC (binary, HTTP/2) materially outperforms
+            # REST for bulk upsert/search throughput. Off by default for
+            # zero-config compatibility (REST-only Qdrant deployments still
+            # work); enable via QDRANT_PREFER_GRPC=true once the gRPC port is
+            # confirmed reachable.
+            prefer_grpc=settings.qdrant_prefer_grpc,
+            grpc_port=settings.qdrant_grpc_port,
             check_compatibility=False,
         )
         static = settings.static.get("vector", {})
@@ -45,6 +51,12 @@ class QdrantStore:
                 merged.append(c)
         self._collections = merged
         self._layouts: dict[str, str] = {}
+        # Perf: cache which collections are confirmed to exist so hot-path
+        # upsert()/search() calls skip a network round-trip existence check
+        # on every single call — collections don't disappear mid-process in
+        # our usage pattern (only reset_collections() removes them, which
+        # also invalidates this cache).
+        self._known_existing: set[str] = set()
 
     def collection_layout(self, name: str) -> str:
         """Return ``hybrid`` (named dense+bm25), ``unnamed`` (legacy dense), or ``missing``."""
@@ -75,11 +87,13 @@ class QdrantStore:
             m=self._hnsw.get("m", 32),
             ef_construct=self._hnsw.get("ef_construct", 256),
         )
+        on_disk = self._settings.qdrant_on_disk_vectors
         if self._settings.sparse_enabled:
             self.client.create_collection(
                 collection_name=name,
                 vectors_config={
-                    "dense": qm.VectorParams(size=self._dim, distance=self._distance),
+                    "dense": qm.VectorParams(size=self._dim, distance=self._distance,
+                                             on_disk=on_disk),
                 },
                 sparse_vectors_config={
                     "bm25": qm.SparseVectorParams(),
@@ -90,10 +104,12 @@ class QdrantStore:
         else:
             self.client.create_collection(
                 collection_name=name,
-                vectors_config=qm.VectorParams(size=self._dim, distance=self._distance),
+                vectors_config=qm.VectorParams(size=self._dim, distance=self._distance,
+                                              on_disk=on_disk),
                 hnsw_config=hnsw,
             )
             self._layouts[name] = "unnamed"
+        self._known_existing.add(name)
         # Payload indexes accelerate filtered retrieval by service/type.
         for field, schema in (
             ("service", qm.PayloadSchemaType.KEYWORD),
@@ -118,7 +134,10 @@ class QdrantStore:
         return getattr(vectors, "size", None)
 
     def _ensure_collection_exists(self, name: str) -> None:
+        if name in self._known_existing:
+            return
         if self.client.collection_exists(name):
+            self._known_existing.add(name)
             actual = self._existing_dim(name)
             if actual is not None and actual != self._dim:
                 raise RuntimeError(
@@ -139,6 +158,7 @@ class QdrantStore:
                 self.client.delete_collection(name)
                 dropped.append(name)
             self._layouts.pop(name, None)
+            self._known_existing.discard(name)
             self._create_collection(name)
         return dropped
 
@@ -154,8 +174,21 @@ class QdrantStore:
         chunks: Sequence[Chunk],
         vectors: Sequence[Sequence[float]],
         sparse_vectors: Sequence[Any] | None = None,
+        *,
+        wait: bool | None = None,
     ) -> int:
-        """Upsert chunks with their dense (and optional sparse) vectors; return count written."""
+        """Upsert chunks with their dense (and optional sparse) vectors; return
+        count written. Uses qdrant-client's `upload_points` (batched +
+        parallelized, size/parallelism from QDRANT_UPSERT_BATCH_SIZE/
+        QDRANT_UPSERT_PARALLEL) instead of one blocking call per collection —
+        the standard high-throughput bulk-ingestion primitive.
+
+        `wait`: override QDRANT_UPSERT_WAIT for this call. Leave unset
+        (defaults to the fast, non-blocking async-ack path) for bulk
+        ingestion; pass `wait=True` only when a caller needs the write
+        durably indexed before its next read (e.g. a single-chunk
+        interactive update immediately followed by a search).
+        """
         by_collection: dict[str, list[qm.PointStruct]] = {}
         for i, (chunk, vector) in enumerate(zip(chunks, vectors)):
             name = self._settings.collection_name(chunk.collection)
@@ -189,13 +222,34 @@ class QdrantStore:
                 qm.PointStruct(id=_point_id(chunk.id), vector=vec, payload=payload)
             )
         total = 0
+        effective_wait = self._settings.qdrant_upsert_wait if wait is None else wait
         for name, points in by_collection.items():
             # Defensive auto-heal: if runtime emits a collection not present at startup,
             # create it on-demand instead of failing the whole ingestion run.
             self._ensure_collection_exists(name)
-            self.client.upsert(collection_name=name, points=points, wait=True)
+            self.client.upload_points(
+                collection_name=name,
+                points=points,
+                batch_size=self._settings.qdrant_upsert_batch_size,
+                parallel=self._settings.qdrant_upsert_parallel,
+                wait=effective_wait,
+            )
             total += len(points)
         return total
+
+    def delete_by_ids(self, chunk_ids: Iterable[str], *, wait: bool = True) -> None:
+        """Delete specific chunks by id across all collections — O(1) point-id
+        lookup rather than a filtered scan, for surgical single-file/single-
+        chunk incremental updates (much cheaper than delete_by_paths when the
+        exact set of stale chunk ids is already known)."""
+        ids = [_point_id(cid) for cid in chunk_ids]
+        if not ids:
+            return
+        for content_type in self._collections:
+            name = self._settings.collection_name(content_type)
+            if name in self._known_existing or self.client.collection_exists(name):
+                self._known_existing.add(name)
+                self.client.delete(name, points_selector=qm.PointIdsList(points=ids), wait=wait)
 
     def delete_by_paths(self, repo: str, rel_paths: Iterable[str]) -> None:
         """Delete indexed vectors for the given repo files across all collections."""
@@ -236,8 +290,10 @@ class QdrantStore:
     ) -> list[RetrievedChunk]:
         """Search one collection (dense, sparse, or fused hybrid) for the top `top_k` chunks."""
         name = self._settings.collection_name(collection)
-        if not self.client.collection_exists(name):
-            return []
+        if name not in self._known_existing:
+            if not self.client.collection_exists(name):
+                return []
+            self._known_existing.add(name)
         flt = self._filter(service, kind)
         ef = self._hnsw.get("ef_search", 64)
         layout = self.collection_layout(name)

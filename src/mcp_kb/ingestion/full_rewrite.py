@@ -41,7 +41,9 @@ def _run_llm_enrichment(*, pilot: bool = False) -> int:
         return 2
     cmd = [sys.executable, str(script)]
     log.info("llm_enrichment_start", script=str(script))
-    proc = subprocess.run(cmd, cwd=str(repo_root), check=False)
+    # Safe: fixed argv (current interpreter + a script path resolved from our
+    # own repo tree, no shell=True, no untrusted/user-supplied arguments).
+    proc = subprocess.run(cmd, cwd=str(repo_root), check=False)  # nosec B603
     if proc.returncode != 0:
         log.error("llm_enrichment_failed", code=proc.returncode)
     else:

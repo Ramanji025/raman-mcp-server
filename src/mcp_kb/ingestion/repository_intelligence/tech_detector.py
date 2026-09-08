@@ -14,10 +14,10 @@ Design principles
 from __future__ import annotations
 
 import re
-import xml.etree.ElementTree as ET
 from collections.abc import Callable
 from pathlib import Path
 
+import defusedxml.ElementTree as ET
 import yaml
 
 from ...logging import get_logger

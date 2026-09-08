@@ -111,6 +111,39 @@ def _prewarm() -> None:
     threading.Thread(target=_service, daemon=True, name="mcp-kb-prewarm").start()
 
 
+def _start_graph_ui(settings) -> None:
+    """Phase 7: optionally serve the local graph visualization UI in the
+    background (GRAPH_UI_ENABLED=true) — never blocks/fails server startup.
+    Follow-on gap 4: single-instance lock so multiple connected agent client
+    sessions on one machine don't each try to bind the same UI port."""
+    if not settings.graph_ui_enabled:
+        return
+    import threading
+    from pathlib import Path
+
+    from .ingestion.single_instance import SingleInstanceLock
+
+    lock = SingleInstanceLock(Path(settings.repos_root).parent / "locks", "graph_ui")
+    if not lock.acquire():
+        log.info("graph_ui_skipped_another_instance_owns_lock")
+        return
+
+    def _run() -> None:
+        import uvicorn
+
+        from .ui.graph_viewer import app as graph_ui_app
+
+        try:
+            uvicorn.run(graph_ui_app, host="127.0.0.1", port=settings.graph_ui_port,
+                       log_level="warning")
+        except Exception as exc:  # pragma: no cover - must never crash the main server
+            log.error("graph_ui_failed", error=str(exc))
+
+    threading.Thread(target=_run, daemon=True, name="mcp-kb-graph-ui").start()
+    log.info("graph_ui_started", port=settings.graph_ui_port,
+            url=f"http://127.0.0.1:{settings.graph_ui_port}")
+
+
 def _emit(response) -> str:
     """Return pre-rendered Markdown so the LLM passes it through without re-processing.
     Returning raw JSON forces the LLM to reformat it, wasting tokens on every call."""
@@ -531,6 +564,74 @@ def compare_versions(repo_name: str, version_a: str, version_b: str) -> str:
 
 
 # --------------------------------------------------------------------------- #
+# Phase 1: platform-parity tools (query_graph, coverage, outline, dead-code, ADR)
+# --------------------------------------------------------------------------- #
+@mcp.tool(annotations=_RO)
+def query_graph(query: str, max_rows: int = 200) -> str:
+    """Run an ad-hoc read-only Cypher query directly against the knowledge graph
+    for questions the structured tools don't cover. Write clauses are rejected."""
+    return _emit(_service().query_graph(query, max_rows=max_rows))
+
+
+@mcp.tool(annotations=_RO)
+def check_index_coverage(service_name: str | None = None) -> str:
+    """Report which files are indexed/up-to-date, stale, or never indexed —
+    call this before concluding something 'doesn't exist' in the codebase."""
+    return _emit(_service().check_index_coverage(service_name))
+
+
+@mcp.tool(annotations=_RO)
+def get_file_outline(file_path: str, limit: int = 100, offset: int = 0) -> str:
+    """Cheap listing of declarations (classes, methods, endpoints) in one file
+    with line ranges — use for orientation before a full explain_code call."""
+    return _emit(_service().get_file_outline(file_path, limit=limit, offset=offset))
+
+
+@mcp.tool(annotations=_RO)
+def find_dead_code(service_name: str | None = None, limit: int = 100) -> str:
+    """Heuristically find methods with zero inbound callers (excluding likely
+    entry points like controllers/listeners/scheduled/main). Verify before deleting."""
+    return _emit(_service().find_dead_code(service_name, limit=limit))
+
+
+@mcp.tool(annotations=_RO)
+def compare_graphs(base_service: str, target_service: str, limit: int = 100) -> str:
+    """Diff nodes (added/removed) between two services/snapshots by qualified name."""
+    return _emit(_service().compare_graphs(base_service, target_service, limit=limit))
+
+
+@mcp.tool(annotations=_RW)
+def manage_adr(project: str, mode: str = "get", content: str | None = None,
+              section_updates: dict[str, str] | None = None) -> str:
+    """Persist/query an Architecture Decision Record for a project across sessions.
+    mode: 'get' | 'update' (replace whole doc) | 'set_sections' | 'sections' (list headings)."""
+    return _emit(_service().manage_adr(project, mode=mode, content=content,
+                                       section_updates=section_updates))
+
+
+@mcp.tool(annotations=_RW)
+def export_snapshot(name: str, service: str | None = None) -> str:
+    """Export the graph (or one service) to a portable, gzip-compressed snapshot
+    file that can be committed/shared instead of re-running full ingestion."""
+    return _emit(_service().export_snapshot(name, service))
+
+
+@mcp.tool(annotations=_RW)
+def import_snapshot(name: str) -> str:
+    """Import a previously exported snapshot (see export_snapshot) into the live graph."""
+    return _emit(_service().import_snapshot(name))
+
+
+@mcp.tool(annotations=_RW)
+def ingest_traces(service_name: str, traces: list[dict]) -> str:
+    """Ingest observed runtime call traces as an opt-in overlay (RUNTIME_CALL
+    edges, distinct from static CALLS). Each trace: {"caller": "<qualified_name>",
+    "callee": "<qualified_name>", "count": <int>}. Never fabricates nodes for
+    unresolved methods — those are reported as skipped."""
+    return _emit(_service().ingest_traces(service_name, traces))
+
+
+# --------------------------------------------------------------------------- #
 # Resources (read-only, addressable context the client can attach directly)
 # --------------------------------------------------------------------------- #
 @mcp.resource("kb://architecture/summary")
@@ -818,6 +919,14 @@ def main() -> None:
 
     settings = get_settings()
     transport = settings.transport.lower()
+
+    # Phase 3: background git-poll watcher (auto-index new repos + incremental
+    # refresh of known repos). No-op unless WATCHER_ENABLED=true.
+    from .ingestion.watcher import get_watcher
+    get_watcher(settings).start()
+
+    # Phase 7: local graph visualization UI. No-op unless GRAPH_UI_ENABLED=true.
+    _start_graph_ui(settings)
 
     # P5.3: CORS hardening — warn loudly if wildcard origins used outside local dev
     if transport == "http":

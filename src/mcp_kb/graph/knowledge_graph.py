@@ -243,6 +243,13 @@ class KnowledgeGraph:
             "by_type": dict(by_type),
         }
 
+    def run_cypher(self, query: str, params: dict | None = None,
+                    max_rows: int = 200) -> list[dict]:
+        """Not supported on the legacy NetworkX backend — use GRAPH_BACKEND=neo4j."""
+        raise NotImplementedError(
+            "query_graph requires GRAPH_BACKEND=neo4j (legacy NetworkX store has no Cypher engine)"
+        )
+
     # ---- persistence ---- #
     def save(self) -> None:
         """Atomically write the graph to its JSON snapshot file and rotate backups."""

@@ -166,6 +166,7 @@ class JavaParser(Parser):
             self._emit_endpoints(source, service, info, ctrl_id, src, result, injections)
             self._emit_delegation_edges(service, ctrl_id, injections, result)
             self._emit_service_methods(source, service, info, ctrl_id, src, result, injections)
+            self._emit_exception_handlers(service, info, src, result, ctrl_id, global_handler=False)
 
         # ---- Service layer ---- #
         if is_service_layer:
@@ -310,6 +311,31 @@ class JavaParser(Parser):
                                       "json_example": json_example})
             )
 
+        # ---- Follow-on gap 7: @Configuration + @Bean factory methods ---- #
+        is_configuration = "Configuration" in ann
+        if is_configuration:
+            config_id = make_node_id("class", service, info.name)
+            if not any(n.id == config_id for n in result.nodes):
+                result.nodes.append(GraphNode(
+                    id=config_id, type=NodeType.CLASS, name=info.name, service=service,
+                    attributes={**base_attrs, "annotations": list(ann.keys()),
+                               "is_configuration": True},
+                ))
+            self._emit_configuration_beans(source, service, info, src, result, config_id)
+
+        # ---- Follow-on gap 7: @ExceptionHandler / @ControllerAdvice ---- #
+        is_advice = bool({"ControllerAdvice", "RestControllerAdvice"} & ann.keys())
+        if is_advice:
+            advice_id = make_node_id("class", service, info.name)
+            if not any(n.id == advice_id for n in result.nodes):
+                result.nodes.append(GraphNode(
+                    id=advice_id, type=NodeType.CLASS, name=info.name, service=service,
+                    attributes={**base_attrs, "annotations": list(ann.keys()),
+                               "is_controller_advice": True},
+                ))
+            self._emit_exception_handlers(service, info, src, result, advice_id,
+                                          global_handler=True)
+
         # ---- Design patterns ---- #
         patterns = self._detect_design_patterns(info)
         for pattern_name in patterns:
@@ -372,6 +398,9 @@ class JavaParser(Parser):
 
         # ---- Kafka ---- #
         self._emit_kafka(source, service, info, src, result)
+
+        # ---- Phase 2: gRPC / GraphQL / generic pub-sub service patterns ---- #
+        self._emit_service_patterns(source, service, info, src, result)
 
         # ---- Fields, constructors, methods, params, annotations, logic ---- #
         owner = next(
@@ -619,6 +648,8 @@ class JavaParser(Parser):
             local_vars    = self._extract_local_variables(method, src)
             m_body_text   = src[method.start_byte:method.end_byte].decode("utf-8", "replace")
             line_count    = m_body_text.count("\n") + 1
+            body_tokens   = self._extract_body_identifier_tokens(method, src)
+            scheduling    = self._extract_scheduling_metadata(m_ann)
 
             method_id = make_node_id("method", service, f"{info.name}.{m_name}")
             result.nodes.append(
@@ -636,10 +667,12 @@ class JavaParser(Parser):
                               "called_methods": called,
                               "local_variables": local_vars,
                               "annotations": list(m_ann.keys()),
+                              "scheduling": scheduling,
                               "line_count": line_count,
                               "start_line": method.start_point[0] + 1,
                               "end_line": method.end_point[0] + 1,
                               "body": m_body_text[:4000],  # cap for graph storage
+                              "body_tokens": body_tokens,  # AST-derived shingle set (similarity pass)
                               "file": source.rel_path,
                           })
             )
@@ -928,7 +961,7 @@ class JavaParser(Parser):
                 declarators = [c for c in field.children if c.type == "variable_declarator"]
                 for d in declarators:
                     fname = self._child_field_text(d, "name", src) or ""
-                    if re.search(r"(Service|Repository|Repo|Client|Template|Mapper)$",
+                    if re.search(r"(Service|Repository|Repo|Client|Template|Mapper|Stub)$",
                                  type_name, re.IGNORECASE):
                         result[fname] = type_name
             else:
@@ -989,6 +1022,34 @@ class JavaParser(Parser):
                 "annotations": list(ann.keys()),
             })
         return params
+
+    # Node types that carry real "vocabulary" tokens for near-duplicate/similarity
+    # analysis; deliberately excludes string/char literals and comments so
+    # log messages and prose don't pollute the fingerprint (mirrors CBM's
+    # identifier/type_identifier/field_identifier token-extraction node set).
+    _IDENT_TOKEN_TYPES = frozenset({
+        "identifier", "type_identifier", "field_identifier",
+    })
+    _BODY_TOKENS_MAX = 128
+
+    def _extract_body_identifier_tokens(self, method: Node, src: bytes) -> str:
+        """AST-based (not regex) identifier-token shingle set for one method body,
+        used by the MinHash similarity pass — walks real tree-sitter node types
+        instead of re-tokenizing raw stored source text."""
+        body = method.child_by_field_name("body")
+        if body is None:
+            return ""
+        seen: list[str] = []
+        seen_set: set[str] = set()
+        for node in self._iter_descendants(body, self._IDENT_TOKEN_TYPES):
+            token = self._text(node, src).strip().lower()
+            if len(token) < 3 or token in seen_set:
+                continue
+            seen_set.add(token)
+            seen.append(token)
+            if len(seen) >= self._BODY_TOKENS_MAX:
+                break
+        return " ".join(seen)
 
     def _extract_called_methods(self, method: Node, src: bytes) -> list[str]:
         """Return list of 'object.method' or 'method' call strings in this method body."""
@@ -1442,6 +1503,232 @@ class JavaParser(Parser):
         )
         result.edges.append(GraphEdge(src=actor_id, dst=topic_id, type=edge))
 
+    def _add_channel_edge(
+        self, service: str, cls: str, channel: str, edge: EdgeType, result: ParseResult,
+    ) -> None:
+        """Generic pub-sub edge: `cls` (a Class actor) EMITS/LISTENS_ON a Queue/event channel."""
+        actor_id = make_node_id("class", service, cls)
+        channel_id = make_node_id("queue", "_shared", channel)
+        result.nodes.append(GraphNode(id=channel_id, type=NodeType.QUEUE, name=channel,
+                                      service=None, attributes={}))
+        result.edges.append(GraphEdge(src=actor_id, dst=channel_id, type=edge,
+                                      attributes={"channel": channel}))
+
+    # ------------------------------------------------------------------ #
+    # Follow-on gap 7: deeper Spring Boot domain modeling
+    # ------------------------------------------------------------------ #
+    def _extract_scheduling_metadata(self, m_ann: dict[str, dict[str, Any]]) -> dict[str, Any] | None:
+        """`@Scheduled`/`@Async`/`@Retryable` structured metadata (cron/fixedDelay/
+        fixedRate/executor/retry policy) — an LLM asked "when does X run" or
+        "is this method retried" needs this without re-reading the annotation text."""
+        info: dict[str, Any] = {}
+        if "Scheduled" in m_ann:
+            sched = m_ann["Scheduled"]
+            info["scheduled"] = {
+                "cron": sched.get("cron"),
+                "fixed_delay": sched.get("fixedDelay") or sched.get("fixedDelayString"),
+                "fixed_rate": sched.get("fixedRate") or sched.get("fixedRateString"),
+                "initial_delay": sched.get("initialDelay") or sched.get("initialDelayString"),
+            }
+        if "Async" in m_ann:
+            info["async"] = {"executor": m_ann["Async"].get("value")}
+        if "Retryable" in m_ann:
+            retry = m_ann["Retryable"]
+            info["retryable"] = {"max_attempts": retry.get("maxAttempts"),
+                                "value": retry.get("value"), "backoff": retry.get("backoff")}
+        return info or None
+
+    def _emit_configuration_beans(
+        self, source: SourceFile, service: str, info: _ClassInfo, src: bytes,
+        result: ParseResult, config_id: str,
+    ) -> None:
+        """`@Configuration` class → one `BeanDefinition` node per `@Bean` method,
+        capturing bean name, produced type, active `@Profile`, and
+        `@ConditionalOnProperty` gating — the exact context an LLM needs to
+        answer "what provides the X bean" / "which beans are conditional"."""
+        if info.body is None:
+            return
+        for method in self._iter_children(info.body, "method_declaration"):
+            m_ann = self._method_annotations(method, src)
+            if "Bean" not in m_ann:
+                continue
+            m_name = self._child_field_text(method, "name", src) or "unknown"
+            bean_ann = m_ann["Bean"]
+            bean_name = bean_ann.get("name") or bean_ann.get("value") or m_name
+            if isinstance(bean_name, list):
+                bean_name = bean_name[0] if bean_name else m_name
+            ret_type = self._child_field_text(method, "type", src) or "Object"
+            profile = m_ann.get("Profile", {}).get("value")
+            conditional = m_ann.get("ConditionalOnProperty") or None
+            bean_id = make_node_id("bean", service, f"{info.name}.{m_name}")
+            result.nodes.append(GraphNode(
+                id=bean_id, type=NodeType.BEAN_DEFINITION, name=str(bean_name), service=service,
+                attributes={"class": info.name, "method": m_name, "returns": ret_type,
+                           "profile": profile, "conditional_on_property": conditional,
+                           "file": source.rel_path,
+                           "start_line": method.start_point[0] + 1,
+                           "end_line": method.end_point[0] + 1},
+            ))
+            result.edges.append(GraphEdge(
+                src=config_id, dst=bean_id, type=EdgeType.GENERATES,
+                attributes={"via": "bean_method", "returns": ret_type},
+            ))
+
+    def _emit_exception_handlers(
+        self, service: str, info: _ClassInfo, src: bytes, result: ParseResult,
+        owner_id: str, *, global_handler: bool,
+    ) -> None:
+        """`@ExceptionHandler` methods → `CATCHES` edges to the handled exception
+        type(s), tagged `global_handler` (from `@ControllerAdvice`/
+        `@RestControllerAdvice`) vs. local-to-one-controller — critical
+        context for "how is X exception handled" queries."""
+        if info.body is None:
+            return
+        for method in self._iter_children(info.body, "method_declaration"):
+            m_ann = self._method_annotations(method, src)
+            if "ExceptionHandler" not in m_ann:
+                continue
+            m_name = self._child_field_text(method, "name", src) or "unknown"
+            handled = m_ann["ExceptionHandler"].get("value")
+            exc_names = handled if isinstance(handled, list) else ([handled] if handled else [])
+            method_id = make_node_id("method", service, f"{info.name}.{m_name}")
+            response_status = self._method_annotations(method, src).get("ResponseStatus", {})
+            for raw in exc_names:
+                exc_name = str(raw).removesuffix(".class").split(".")[-1].strip()
+                if not exc_name:
+                    continue
+                exc_id = make_node_id("exception", service, exc_name)
+                if not any(n.id == exc_id for n in result.nodes):
+                    result.nodes.append(GraphNode(
+                        id=exc_id, type=NodeType.EXCEPTION_TYPE, name=exc_name, service=service,
+                        attributes={"referenced_only": True},
+                    ))
+                result.edges.append(GraphEdge(
+                    src=method_id, dst=exc_id, type=EdgeType.CATCHES,
+                    attributes={"global_handler": global_handler, "handler_class": info.name,
+                               "http_status": response_status.get("value") or response_status.get("code")},
+                ))
+
+
+    # All detection here is AST-based (tree-sitter node walks), not regex —
+    # regex on raw source text is fragile against multi-line calls, string
+    # concatenation, and comments; AST traversal reuses the same
+    # method_invocation/argument_list structure the CALLS-edge extractor uses.
+    # ------------------------------------------------------------------ #
+    def _emit_service_patterns(
+        self, source: SourceFile, service: str, info: _ClassInfo, src: bytes,
+        result: ParseResult,
+    ) -> None:
+        if info.body is None:
+            return
+        # Field-declared stub/template types (constructor or @Autowired injection)
+        # plus the existing Service/Repository/Client/Template heuristic — reused
+        # so `xStub.rpcMethod()` resolves to a real declared gRPC stub type.
+        field_types = self._extract_field_injections(info, src)
+
+        for method in self._iter_children(info.body, "method_declaration"):
+            m_annotations = self._method_annotations(method, src)
+            m_name = self._child_field_text(method, "name", src) or "unknown"
+            method_id = make_node_id("method", service, f"{info.name}.{m_name}")
+
+            # GraphQL resolvers: @QueryMapping/@MutationMapping/@SchemaMapping
+            graphql_ann = next(
+                (a for a in ("QueryMapping", "MutationMapping", "SchemaMapping",
+                             "SubscriptionMapping") if a in m_annotations), None,
+            )
+            if graphql_ann:
+                field_name = (m_annotations[graphql_ann].get("value")
+                             or m_annotations[graphql_ann].get("name") or m_name)
+                endpoint_id = make_node_id("endpoint", service, f"graphql:{field_name}")
+                result.nodes.append(GraphNode(
+                    id=endpoint_id, type=NodeType.ENDPOINT, name=f"graphql:{field_name}",
+                    service=service, attributes={"protocol": "graphql", "operation": graphql_ann},
+                ))
+                result.edges.append(GraphEdge(src=method_id, dst=endpoint_id,
+                                              type=EdgeType.GRAPHQL_RESOLVES))
+
+            # Generic pub-sub consumer: @RabbitListener(queues = "...")
+            if "RabbitListener" in m_annotations:
+                for queue in self._listener_topics(m_annotations["RabbitListener"]):
+                    self._add_channel_edge(service, info.name, queue, EdgeType.LISTENS_ON, result)
+
+            # Domain event consumer: @EventListener
+            if "EventListener" in m_annotations:
+                params = method.child_by_field_name("parameters")
+                if params is not None:
+                    for p in self._iter_children(params, "formal_parameter"):
+                        p_type = self._child_field_text(p, "type", src)
+                        if p_type:
+                            self._add_channel_edge(service, info.name, p_type,
+                                                  EdgeType.LISTENS_ON, result)
+
+            # Local-variable stub/template declarations scoped to this method
+            # (e.g. a stub built inline rather than injected as a field).
+            local_types = {v["name"]: v["type"] for v in self._extract_local_variables(method, src)}
+            scoped_types = {**field_types, **local_types}
+
+            for inv in self._iter_descendants(method, {"method_invocation"}):
+                self._classify_service_pattern_call(service, info.name, inv, src,
+                                                    scoped_types, result)
+
+    _MESSAGING_TEMPLATE_RE = re.compile(r"(Rabbit|Amqp|Jms)Template\b")
+
+    def _classify_service_pattern_call(
+        self, service: str, cls_name: str, inv: Node, src: bytes,
+        scoped_types: dict[str, str], result: ParseResult,
+    ) -> None:
+        """Inspect one `method_invocation` AST node and emit EMITS/GRPC_CALLS
+        edges if it matches a known messaging/gRPC client call shape."""
+        name_node = inv.child_by_field_name("name")
+        obj_node = inv.child_by_field_name("object")
+        if name_node is None:
+            return
+        call_name = self._text(name_node, src)
+        obj_text = self._text(obj_node, src) if obj_node is not None else ""
+        args_node = inv.child_by_field_name("arguments")
+
+        # RabbitMQ/JMS producer: rabbitTemplate.convertAndSend("routingKey", ...)
+        if call_name == "convertAndSend" and self._MESSAGING_TEMPLATE_RE.search(obj_text):
+            routing_key = self._first_arg_of_type(args_node, "string_literal", src)
+            if routing_key:
+                self._add_channel_edge(service, cls_name, routing_key.strip('"'),
+                                      EdgeType.EMITS, result)
+            return
+
+        # Domain event producer: eventPublisher.publishEvent(new XEvent(...))
+        if call_name == "publishEvent":
+            ctor = self._first_arg_of_type(args_node, "object_creation_expression", src)
+            if ctor:
+                result_type = ctor.split("(")[0].split("<")[0].strip()
+                if result_type:
+                    self._add_channel_edge(service, cls_name, result_type, EdgeType.EMITS, result)
+            return
+
+        # gRPC client call: a variable/field whose *declared* type ends in
+        # "Stub" (BlockingStub/FutureStub/Stub — standard grpc-java naming).
+        obj_base = obj_text.split(".")[0].strip()
+        declared_type = scoped_types.get(obj_base)
+        if declared_type and declared_type.endswith("Stub"):
+            client_id = make_node_id("class", service, f"grpc_client:{declared_type}")
+            result.nodes.append(GraphNode(
+                id=client_id, type=NodeType.CLASS, name=f"grpc_client:{declared_type}",
+                service=service, attributes={"protocol": "grpc", "stub": declared_type},
+            ))
+            result.edges.append(GraphEdge(
+                src=make_node_id("class", service, cls_name), dst=client_id,
+                type=EdgeType.GRPC_CALLS,
+                attributes={"stub": declared_type, "rpc_method": call_name},
+            ))
+
+    def _first_arg_of_type(self, args_node: Node | None, node_type: str, src: bytes) -> str | None:
+        """Return the source text of the first argument of a given AST node type."""
+        if args_node is None:
+            return None
+        for child in args_node.children:
+            if child.type == node_type:
+                return self._text(child, src)
+        return None
+
     # ------------------------------------------------------------------ #
     # Tree-sitter helpers
     # ------------------------------------------------------------------ #
@@ -1515,7 +1802,8 @@ class JavaParser(Parser):
                     if key:
                         args[key] = val
                 elif child.type in ("string_literal", "array_initializer",
-                                    "field_access", "identifier"):
+                                    "element_value_array_initializer",
+                                    "field_access", "identifier", "class_literal"):
                     args.setdefault("value", self._annotation_value(child, src))
         return name, args
 
@@ -1524,11 +1812,14 @@ class JavaParser(Parser):
             return None
         if node.type == "string_literal":
             return self._text(node, src).strip('"')
-        if node.type == "array_initializer":
+        if node.type in ("array_initializer", "element_value_array_initializer"):
             vals = []
             for c in node.children:
                 if c.type == "string_literal":
                     vals.append(self._text(c, src).strip('"'))
+                elif c.type in ("field_access", "identifier", "class_literal"):
+                    # e.g. `@ExceptionHandler({NotFoundException.class, ConflictException.class})`
+                    vals.append(self._text(c, src))
             return vals
         return self._text(node, src)
 

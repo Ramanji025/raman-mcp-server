@@ -80,6 +80,15 @@ class GraphStorePort(Protocol):
     def stats(self) -> dict:
         """Return node/edge counts and other summary graph statistics."""
         ...
+    def run_cypher(self, query: str, params: dict | None = None,
+                    max_rows: int = 200) -> list[dict]:
+        """Execute a read-only Cypher query and return up to `max_rows` rows as dicts.
+
+        Implementations must reject write clauses (CREATE/MERGE/DELETE/SET/
+        REMOVE/DROP/CALL db.* write procs) — this is an agent-facing ad-hoc
+        query surface, not a mutation API.
+        """
+        ...
 
     # ---- persistence ---- #
     def save(self) -> None:

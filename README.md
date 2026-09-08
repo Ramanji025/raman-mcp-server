@@ -47,6 +47,32 @@ platforms (e.g. a `curl`/`docker` invocation), it is shown once.
 - RCA, Kafka topology, API contracts, branch/version diffs, security/quality scans.
 - Optional **Langfuse** LLM tracing and a **prompt-injection guardrail** on retrieved
   context — see [Observability & guardrails](#observability--guardrails).
+- **Multi-language code intelligence**: deep Spring Boot/Java parsing plus a generic
+  tree-sitter engine covering Python, Go, TypeScript/TSX, JavaScript, C#, Rust, Ruby,
+  PHP, C, C++ and Bash — same graph schema (Method/Class/CALLS/DATA_FLOWS) regardless
+  of language. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#8-codebase-memory-mcp-parity-roadmap).
+- **Agent-facing platform tools**: tool profiles (`ALL`/`ANALYSIS`/`SCOUT`), ad-hoc
+  `query_graph` (read-only Cypher), `check_index_coverage`, `get_file_outline`,
+  `find_dead_code`, `manage_adr`, `compare_graphs`, `export_snapshot`/`import_snapshot`,
+  `ingest_traces` (runtime trace overlay).
+- **Graph enrichment**: MinHash near-duplicate detection (`SIMILAR_TO`), git
+  co-change coupling (`FILE_CHANGES_WITH`), infra-as-code modeling (Dockerfile/K8s),
+  optional semantic vocabulary-bridging edges.
+- **Continuous indexing**: background git-poll watcher + auto-index, with a
+  single-instance lock so multiple connected agent sessions don't duplicate work.
+- **Local graph visualization UI** (`GRAPH_UI_ENABLED=true`) and an officially
+  supported zero-infrastructure graph backend (`GRAPH_BACKEND=networkx`).
+- **Agent auto-discovery**: `mcp-kb-install-agents` detects and configures Claude
+  Desktop / VS Code / Cursor automatically.
+- **Performance & security hardening**: benchmarked/regression-gated ingestion
+  performance, bandit SAST + hypothesis-based adversarial fuzz testing, XXE-hardened
+  XML parsing, path-traversal-safe file tools.
+- **High-throughput Qdrant**: batched/parallel `upload_points` bulk ingestion,
+  cached collection-existence checks, targeted `delete_by_ids`, optional gRPC transport.
+- **Deep Spring Boot domain modeling**: `@Configuration`/`@Bean` → `BeanDefinition`
+  nodes, `@ExceptionHandler`/`@ControllerAdvice` → exception-handling edges,
+  `@Scheduled`/`@Async`/`@Retryable` structured metadata — so the LLM gets precise
+  Spring wiring context before it writes code.
 Slash prompts take **no extra form fields**; they apply to the current chat message.
 ## Architecture
 ```mermaid
@@ -661,6 +687,14 @@ Default NL door: **`ask`**. Specialized tools are optional follow-ups.
 | `full_kt` / `onboarding_assistant` | Knowledge transfer |
 | `get_method_detail` / `trace_call_chain` / `find_callers` / `find_callees` | Call graph |
 | `get_defect_changes` | Ticket diffs |
+| `query_graph` | Ad-hoc read-only Cypher against the knowledge graph |
+| `check_index_coverage` | Which files are indexed/stale/never-indexed |
+| `get_file_outline` | Cheap declaration listing for one file |
+| `find_dead_code` | Methods with zero inbound callers (heuristic) |
+| `compare_graphs` | Arbitrary node/edge diff between two services/snapshots |
+| `manage_adr` | Persist/query Architecture Decision Records |
+| `export_snapshot` / `import_snapshot` | Portable gzip+JSON graph snapshot (share instead of re-ingesting) |
+| `ingest_traces` | Runtime trace overlay (`RUNTIME_CALL` edges; never fabricates nodes) |
 Resources: `kb://architecture/summary`, `kb://services`, `kb://service/{name}`.
 ## Online learning
 With `LEARNING_ENABLED=true` in `.env`:
@@ -745,6 +779,12 @@ Set in `.env`, the MCP client `env` block, or the process environment.
 | `QDRANT_URL` | `http://localhost:6333` | Qdrant REST |
 | `QDRANT_API_KEY` | unset | Qdrant API key |
 | `QDRANT_COLLECTION_PREFIX` | `mcpkb` | Collection prefix |
+| `QDRANT_PREFER_GRPC` | `false` | Use gRPC transport (faster bulk upsert/search; needs the gRPC port reachable) |
+| `QDRANT_GRPC_PORT` | `6334` | Qdrant gRPC port |
+| `QDRANT_UPSERT_BATCH_SIZE` | `256` | `upload_points` batch size (bulk ingestion) |
+| `QDRANT_UPSERT_PARALLEL` | `2` | `upload_points` parallel workers |
+| `QDRANT_UPSERT_WAIT` | `false` | `true` = wait for full index durability; `false` = fast async ack |
+| `QDRANT_ON_DISK_VECTORS` | `false` | Store vectors on disk instead of RAM (only for indexes too large to fit in memory) |
 | `EMBEDDING_PROVIDER` | `fastembed` | `fastembed` / `sentence-transformers` / `openai` |
 | `EMBEDDING_MODEL` | `BAAI/bge-small-en-v1.5` | Embedding model id |
 | `EMBEDDING_DIM` | `384` | Vector size (must match model) |
@@ -755,7 +795,7 @@ Set in `.env`, the MCP client `env` block, or the process environment.
 | `OLLAMA_BASE_URL` | `http://localhost:11434/v1` | OpenAI-compatible Ollama |
 | `POSTGRES_ENABLED` | `true` | `false` = JSON metadata fallback |
 | `POSTGRES_DSN` | local `mcpkb` | Postgres URL |
-| `GRAPH_BACKEND` | `neo4j` | Required `neo4j` |
+| `GRAPH_BACKEND` | `neo4j` | `neo4j` (default, scale-out) or `networkx` (zero-infrastructure local mode) |
 | `NEO4J_URI` | `bolt://localhost:7687` | Bolt URI |
 | `NEO4J_USER` / `NEO4J_PASSWORD` | `neo4j` | Credentials |
 | `NEO4J_AUTH_ENABLED` | `true` | Set `false` for passwordless local Docker |
@@ -792,6 +832,21 @@ Set in `.env`, the MCP client `env` block, or the process environment.
 | `SENSITIVE_SCAN_ENABLED` | `true` | Redact secrets at index time |
 | `RALLY_API_KEY` | unset | Rally for story ids |
 | `RALLY_BASE_URL` | Rally v2 URL | Rally API |
+| `RALLY_VERIFY_SSL` | `true` | Secure by default; disable only for a trusted internal Rally instance with a self-signed cert |
+| `MCP_KB_TOOL_PROFILE` | `ALL` | `ALL` / `ANALYSIS` (read-only) / `SCOUT` (minimal discovery) tool visibility |
+| `MCP_KB_LIST_DEFAULT_LIMIT` / `MCP_KB_LIST_MAX_LIMIT` | `50` / `500` | Pagination caps on list-returning tools |
+| `MCP_KB_ADR_DIR` | `./data/adr` | Architecture Decision Record storage |
+| `SIMILARITY_ENABLED` | `true` | MinHash+LSH near-duplicate method detection → `SIMILAR_TO` edges |
+| `SIMILARITY_MINHASH_K` / `SIMILARITY_LSH_BANDS` / `SIMILARITY_JACCARD_THRESHOLD` | `32` / `8` / `0.4` | Similarity pass tuning |
+| `SEMANTIC_BRIDGE_ENABLED` | `false` | Embedding-cosine vocabulary-mismatch bridge → `SEMANTICALLY_RELATED` edges (O(n²)/service, opt-in) |
+| `GIT_COUPLING_ENABLED` | `true` | Git co-change coupling → `FILE_CHANGES_WITH` edges |
+| `GIT_COUPLING_MIN_COMMITS` / `GIT_COUPLING_MIN_SCORE` / `GIT_COUPLING_LOOKBACK_DAYS` | `3` / `0.3` / `180` | Coupling pass tuning |
+| `INFRA_PARSING_ENABLED` | `true` | Dockerfile/Kubernetes/Kustomize manifests as graph nodes |
+| `WATCHER_ENABLED` | `false` | Background git-poll watcher (auto-refresh known repos) |
+| `WATCHER_INTERVAL_MINUTES` | `15` | Watcher poll interval |
+| `AUTO_INDEX_ENABLED` / `AUTO_INDEX_LIMIT` | `false` / `20000` | Auto-index repos found under `MCP_KB_REPOS_ROOT` never ingested before |
+| `MCP_KB_SNAPSHOT_DIR` | `./data/snapshots` | `export_snapshot`/`import_snapshot` storage |
+| `GRAPH_UI_ENABLED` / `GRAPH_UI_PORT` | `false` / `8765` | Local graph visualization UI (`localhost` only) |
 Example local setup without PostgreSQL (session, or the same keys in `.env`):
 ```powershell
 $env:POSTGRES_ENABLED = "false"
@@ -841,13 +896,16 @@ results are reproducible and every detection is logged via `structlog`
 ## CLI command reference
 | Command | Purpose |
 |---|---|
-| `mcp-kb-build-all` | Full project rebuild (parse → graph → embed → enrich) |
+| `mcp-kb-build-all` | Full project rebuild (parse → graph → embed → enrich → graph enrichment passes) |
 | `mcp-kb-rewrite` | Full project rewrite (clone, parse, embed, enrich) |
 | `mcp-kb-enrich` | Java/Spring LLM enrichment → Neo4j + Qdrant |
 | `mcp-kb-ingest` | Project ingest (`--clone`, `--with-embeddings`, `--repo`) |
 | `mcp-kb-refresh` | Incremental ingest of git diffs |
-| `mcp-kb-server` | MCP server (stdio or HTTP) |
+| `mcp-kb-server` | MCP server (stdio or HTTP); auto-starts the watcher/graph UI if enabled |
 | `mcp-kb-eval` | Golden-question eval against live `ask` |
+| `mcp-kb-eval-perf` | Performance benchmark + CI regression gate (parse throughput, query latency, token efficiency) |
+| `mcp-kb-ui` | Standalone local graph visualization UI |
+| `mcp-kb-install-agents` | Auto-detect and configure Claude Desktop / VS Code / Cursor MCP entries |
 ## Testing
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
@@ -860,6 +918,21 @@ results are reproducible and every detection is logged via `structlog`
 .venv/bin/python -m pytest tests/unit -q
 ```
 Unit tests do not need Qdrant. Some integration tests do.
+### Security & performance gates
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[security]"
+.\.venv\Scripts\python.exe scripts\security_audit.py    # bandit SAST, fails on HIGH severity
+.\.venv\Scripts\python.exe -m mcp_kb.eval.cli_perf        # parse-throughput regression gate
+.\.venv\Scripts\python.exe -m pytest tests\unit\test_security_adversarial.py -v
+```
+```bash
+.venv/bin/pip install -e ".[security]"
+.venv/bin/python scripts/security_audit.py
+.venv/bin/python -m mcp_kb.eval.cli_perf
+.venv/bin/python -m pytest tests/unit/test_security_adversarial.py -v
+```
+Both are wired as CI gates in `.github/workflows/security.yml` and
+`.github/workflows/benchmark.yml`.
 ## Troubleshooting
 ### Collection `mcpkb_semantic` missing
 ```powershell
@@ -939,7 +1012,7 @@ Postgres:
 ```
 ## Additional documentation
 - [docs/USER_GUIDE.md](docs/USER_GUIDE.md)
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — see [§8 Codebase-memory-mcp parity roadmap](docs/ARCHITECTURE.md#8-codebase-memory-mcp-parity-roadmap) for the multi-language engine, graph enrichment, continuous indexing, security hardening, and performance work
 - [docs/ENTERPRISE_ARCHITECTURE.md](docs/ENTERPRISE_ARCHITECTURE.md)
 - [docs/DIGITAL_TWIN_ENTERPRISE_ARCHITECTURE.md](docs/DIGITAL_TWIN_ENTERPRISE_ARCHITECTURE.md)
 - [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)

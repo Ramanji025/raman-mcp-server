@@ -90,6 +90,13 @@ def _run_project_knowledge(args: argparse.Namespace) -> bool:
     else:
         print("Stage 5 skipped (--skip-dependencies).")
 
+    # Stage 8: Phase 2 graph enrichment (similarity, git coupling, semantic bridge)
+    if not args.skip_enrichment:
+        _banner("Stage 8/8", "Graph Enrichment (SIMILAR_TO / FILE_CHANGES_WITH / SEMANTICALLY_RELATED)")
+        _run_graph_enrichment(pipeline)
+    else:
+        print("Stage 8 skipped (--skip-enrichment).")
+
     # Stage 7: LLM Semantic Enrichment
     if args.skip_llm:
         print("Stage 7 skipped (--skip-llm).")
@@ -113,6 +120,32 @@ def _run_project_knowledge(args: argparse.Namespace) -> bool:
     return True
 
 
+def _run_graph_enrichment(pipeline: IngestionPipeline) -> None:
+    """Run Phase 2 cross-cutting graph-enrichment passes over the whole graph."""
+    settings = pipeline.settings
+
+    if settings.similarity_enabled:
+        from .enrichment.similarity import SimilarityEnrichment
+        n = SimilarityEnrichment(settings, pipeline.graph).run()
+        print(f"  SIMILAR_TO edges created: {n}")
+
+    if settings.git_coupling_enabled:
+        from .enrichment.git_coupling import GitCouplingEnrichment
+        coupler = GitCouplingEnrichment(settings, pipeline.graph)
+        total = 0
+        for repo_name in pipeline.git.discover_local_repos():
+            total += coupler.run(repo_name, pipeline.git.root / repo_name)
+        print(f"  FILE_CHANGES_WITH edges created: {total}")
+
+    if settings.semantic_bridge_enabled:
+        from .enrichment.semantic_bridge import SemanticBridgeEnrichment
+        bridge = SemanticBridgeEnrichment(settings, pipeline.graph)
+        total = 0
+        for service in pipeline.graph.services():
+            total += bridge.run(service)
+        print(f"  SEMANTICALLY_RELATED edges created: {total}")
+
+
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
@@ -127,6 +160,7 @@ def cli_build_all() -> None:
     parser.add_argument("--skip-clone",        action="store_true", help="Skip git clone/pull.")
     parser.add_argument("--skip-dependencies", action="store_true", help="Skip Stage 5: dependency intelligence.")
     parser.add_argument("--skip-embeddings",   action="store_true", help="Skip vector embedding generation.")
+    parser.add_argument("--skip-enrichment",   action="store_true", help="Skip Stage 8: graph enrichment (similarity/coupling/semantic-bridge).")
     parser.add_argument("--skip-llm",          action="store_true", help="Skip Stage 7: LLM enrichment.")
     parser.add_argument("--pilot-llm",         action="store_true", help="Use pilot LLM script instead of full.")
     parser.add_argument("--allow-llm-failure", action="store_true", help="Don't fail on LLM errors.")

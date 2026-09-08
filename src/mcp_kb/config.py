@@ -73,6 +73,23 @@ class Settings(BaseSettings):
     qdrant_url: str = Field("http://localhost:6333", alias="QDRANT_URL")
     qdrant_api_key: str | None = Field(None, alias="QDRANT_API_KEY")
     qdrant_collection_prefix: str = Field("mcpkb", alias="QDRANT_COLLECTION_PREFIX")
+    # Follow-on gap 1 perf: gRPC transport is materially faster than REST for
+    # bulk upsert/search (binary protocol, HTTP/2 multiplexing). Requires the
+    # gRPC port (6334 by default) to be reachable; falls back cleanly if not.
+    qdrant_prefer_grpc: bool = Field(False, alias="QDRANT_PREFER_GRPC")
+    qdrant_grpc_port: int = Field(6334, alias="QDRANT_GRPC_PORT")
+    # upload_points batching/parallelism (qdrant-client's own high-throughput
+    # bulk-upload primitive — replaces a single blocking client.upsert() call).
+    qdrant_upsert_batch_size: int = Field(256, alias="QDRANT_UPSERT_BATCH_SIZE")
+    qdrant_upsert_parallel: int = Field(2, alias="QDRANT_UPSERT_PARALLEL")
+    # wait=False acks as soon as the write is durable in the WAL, without
+    # blocking for the HNSW index to finish updating — much faster bulk
+    # ingestion throughput; set true only if a caller needs read-your-writes
+    # consistency immediately after upsert (rare — see upsert()'s `wait` arg).
+    qdrant_upsert_wait: bool = Field(False, alias="QDRANT_UPSERT_WAIT")
+    # Keep full vectors in RAM (fastest) by default; set true only when the
+    # index no longer fits in memory (trades query latency for footprint).
+    qdrant_on_disk_vectors: bool = Field(False, alias="QDRANT_ON_DISK_VECTORS")
 
     # ---- Embeddings ----
     embedding_provider: str = Field("fastembed", alias="EMBEDDING_PROVIDER")
@@ -185,6 +202,55 @@ class Settings(BaseSettings):
     audit_log_enabled: bool = Field(True, alias="AUDIT_LOG_ENABLED")
     sensitive_scan_enabled: bool = Field(True, alias="SENSITIVE_SCAN_ENABLED")
 
+    # ---- Phase 1: agent-facing tool profiles (ALL | ANALYSIS | SCOUT) ----
+    # Restricts which tools a session/client sees, independent of RBAC's
+    # per-repo policy. See security/tool_profiles.py for the tool sets.
+    tool_profile: str = Field("ALL", alias="MCP_KB_TOOL_PROFILE")
+
+    # ---- Phase 1: response pagination / size caps (token-budget discipline) ----
+    tool_list_default_limit: int = Field(50, alias="MCP_KB_LIST_DEFAULT_LIMIT")
+    tool_list_max_limit: int = Field(500, alias="MCP_KB_LIST_MAX_LIMIT")
+
+    # ---- Phase 1: ADR (Architecture Decision Record) storage ----
+    adr_store_dir: Path = Field(Path("./data/adr"), alias="MCP_KB_ADR_DIR")
+
+    # ---- Phase 2: graph enrichment passes (post-ingestion, cross-cutting) ----
+    similarity_enabled: bool = Field(True, alias="SIMILARITY_ENABLED")
+    similarity_minhash_k: int = Field(32, alias="SIMILARITY_MINHASH_K")
+    similarity_lsh_bands: int = Field(8, alias="SIMILARITY_LSH_BANDS")
+    similarity_jaccard_threshold: float = Field(0.4, alias="SIMILARITY_JACCARD_THRESHOLD")
+
+    semantic_bridge_enabled: bool = Field(False, alias="SEMANTIC_BRIDGE_ENABLED")
+    semantic_bridge_min_cosine: float = Field(0.82, alias="SEMANTIC_BRIDGE_MIN_COSINE")
+    semantic_bridge_max_methods: int = Field(1500, alias="SEMANTIC_BRIDGE_MAX_METHODS")
+
+    git_coupling_enabled: bool = Field(True, alias="GIT_COUPLING_ENABLED")
+    git_coupling_min_commits: int = Field(3, alias="GIT_COUPLING_MIN_COMMITS")
+    git_coupling_min_score: float = Field(0.3, alias="GIT_COUPLING_MIN_SCORE")
+    git_coupling_lookback_days: int = Field(180, alias="GIT_COUPLING_LOOKBACK_DAYS")
+
+    infra_parsing_enabled: bool = Field(True, alias="INFRA_PARSING_ENABLED")
+
+    # ---- Phase 3: continuous/incremental indexing ----
+    # Background thread that periodically `git pull`s + incrementally
+    # re-indexes every known repo. Off by default — enable for long-running
+    # server deployments; one-shot CLI ingestion is unaffected either way.
+    watcher_enabled: bool = Field(False, alias="WATCHER_ENABLED")
+    watcher_interval_minutes: int = Field(15, alias="WATCHER_INTERVAL_MINUTES")
+    # Auto-index repos that appear under MCP_KB_REPOS_ROOT but were never
+    # ingested (e.g. cloned manually), bounded by file count for safety.
+    auto_index_enabled: bool = Field(False, alias="AUTO_INDEX_ENABLED")
+    auto_index_limit: int = Field(20000, alias="AUTO_INDEX_LIMIT")
+
+    # ---- Phase 3: portable graph snapshot export/import ----
+    snapshot_dir: Path = Field(Path("./data/snapshots"), alias="MCP_KB_SNAPSHOT_DIR")
+
+    # ---- Phase 7: local graph visualization UI ----
+    # Off by default; auto-started by server.py's main() when enabled, or run
+    # standalone via `mcp-kb-ui` / `python -m mcp_kb.ui.graph_viewer`.
+    graph_ui_enabled: bool = Field(False, alias="GRAPH_UI_ENABLED")
+    graph_ui_port: int = Field(8765, alias="GRAPH_UI_PORT")
+
     # ---- Security: prompt-injection guardrail (retrieved context → LLM) ----
     prompt_guard_enabled: bool = Field(True, alias="PROMPT_GUARD_ENABLED")
     # mode: sanitize (neutralize + keep chunk) | drop (exclude flagged chunk)
@@ -234,6 +300,9 @@ class Settings(BaseSettings):
     )
     rally_workspace_ref: str | None = Field(None, alias="RALLY_WORKSPACE_REF")
     rally_project_ref: str | None = Field(None, alias="RALLY_PROJECT_REF")
+    # Secure by default (Phase 6). Only set false for a trusted internal Rally
+    # instance with a self-signed cert you cannot add to the CA bundle.
+    rally_verify_ssl: bool = Field(True, alias="RALLY_VERIFY_SSL")
 
     # ---- Static config path ----
     config_yaml: Path = Field(Path("./config/config.yaml"))

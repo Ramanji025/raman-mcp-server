@@ -22,6 +22,7 @@ from ..logging import get_logger
 from ..models import ToolResponse
 from .audit_log import AuditLog, get_audit_log
 from .rbac import RBACPolicy, get_rbac_policy
+from .tool_profiles import allowed_tools_for_profile
 
 log = get_logger(__name__)
 
@@ -51,8 +52,10 @@ def _denied_response(tool_name: str, query: dict[str, Any], reason: str) -> Tool
     )
 
 
-def secured(tool_name: str, policy: RBACPolicy, audit: AuditLog):
-    """Decorator: RBAC-check + audit-log one bound tool method call."""
+def secured(tool_name: str, policy: RBACPolicy, audit: AuditLog, *,
+            tool_profile: str = "ALL"):
+    """Decorator: tool-profile gate + RBAC-check + audit-log one bound tool call."""
+    allowed = allowed_tools_for_profile(tool_profile)
 
     def decorator(fn):
         try:
@@ -72,6 +75,15 @@ def secured(tool_name: str, policy: RBACPolicy, audit: AuditLog):
                     bound_args = dict(kwargs)
             else:
                 bound_args = dict(kwargs)
+
+            if allowed is not None and tool_name not in allowed:
+                audit.record(principal=policy.resolve_principal(), tool=tool_name,
+                            query=bound_args, repo_scope=None, allowed=False,
+                            denial_reason=f"tool_profile '{tool_profile}' excludes this tool")
+                return _denied_response(
+                    tool_name, bound_args,
+                    f"tool '{tool_name}' is not available under tool profile '{tool_profile}'",
+                )
 
             repo_scope = _infer_repo_scope(bound_args)
             principal = policy.resolve_principal()
@@ -111,5 +123,6 @@ def instrument_with_security(instance: Any, settings: Settings, *,
         bound = getattr(instance, attr_name)
         if not callable(bound):
             continue
-        setattr(instance, attr_name, secured(attr_name, policy, audit)(bound))
+        setattr(instance, attr_name,
+                secured(attr_name, policy, audit, tool_profile=settings.tool_profile)(bound))
     instance._kb_security_instrumented = True
